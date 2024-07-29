@@ -18,7 +18,7 @@
             <li class="layui-nav-item layui-show-xs-inline-block layui-hide-sm" lay-header-event="menuLeft">
                 <i class="layui-icon layui-icon-spread-left"></i>
             </li>
-            <li class="layui-nav-item layui-hide-xs" lay-on="nav-change-content"
+            <li class="layui-nav-item layui-hide-xs layui-this" lay-on="nav-change-content"
                 lay-data="chat-chatgpt-content"><a href="javascript:;">ChatGPT</a></li>
             <li class="layui-nav-item layui-hide-xs" lay-on="nav-change-content"
                 lay-data="chat-tongyi-content"><a href="javascript:;">通义千问</a></li>
@@ -46,8 +46,10 @@
             <li class="layui-nav-item layui-show-xs-inline-block layui-hide-sm" lay-header-event="menuLeft">
                 <i class="layui-icon layui-icon-spread-left"></i>
             </li>
-            <li class="layui-nav-item layui-hide-xs"><a href="javascript:;">推荐</a></li>
-            <li class="layui-nav-item layui-hide-xs"><a href="javascript:;">最新</a></li>
+            <li class="layui-nav-item layui-hide-xs" lay-on="nav-change-content"
+                lay-data="discuss-content"><a href="javascript:;">推荐</a></li>
+            <li class="layui-nav-item layui-hide-xs" lay-on="nav-change-content"
+                lay-data="discuss-content-new"><a href="javascript:;">最新</a></li>
         </ul>
         <ul class="layui-nav layui-layout-right">
             <li class="layui-nav-item layui-hide layui-show-sm-inline-block">
@@ -86,8 +88,8 @@
     </div>
     <div class="layui-body">
         <!-- 内容主体区域 -->
-        <div>
-            <div style="padding: 15px;">
+        <div style="padding: 15px;">
+            <div>
                 <div id="chat-chatgpt-content" class="layui-card layui-panel">
                     <div class="layui-card-header layui-font-16">
                         ChatGPT 提出的问题？
@@ -152,11 +154,26 @@
                         绘图-wenxin 回答的答案
                     </div>
                 </div>
+                <div id="discuss-content" class="layui-card layui-panel" style="display: none;">
+                    <div class="layui-card-header layui-font-16">
+                        推荐话题讨论
+                    </div>
+                    <div class="layui-card-body">
+                        推荐话题讨论详情
+                    </div>
+                </div>
+                <div id="discuss-content-new" class="layui-card layui-panel" style="display: none;">
+                    <div class="layui-card-header layui-font-16">
+                        最新话题讨论
+                    </div>
+                    <div class="layui-card-body">
+                        最新话题讨论详情
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-
-    <div class="layui-footer" style="height: 80px;line-height: 80px;">
+    <div id="footer-chat" class="layui-footer" style="height: 80px;line-height: 80px;">
         <!-- 底部固定区域 -->
         <div style="width: 80%">
             <div class="layui-input-group" style="width: 100%;">
@@ -185,16 +202,40 @@
                 jQuery("#chat-nav").hide();
                 jQuery("#draw-nav").hide();
                 jQuery("#discuss-nav").show();
+                // 标签页重置显示第一个
+                var showDivId = "discuss-content";
+                jQuery("#" + showDivId).show();    // 显示自己的内容
+                jQuery("#" + showDivId).siblings().hide();    // 隐藏所有同级 div 的内容
+                jQuery("#discuss-nav").find("li").removeClass("layui-this");
+                jQuery("#discuss-nav").find("li").eq(1).addClass("layui-this");
+                // 隐藏聊天文本框
+                jQuery("#footer-chat").hide();
             },
             'chat-nav-show': function () {        // 显示对话标签页
                 jQuery("#chat-nav").show();
                 jQuery("#draw-nav").hide();
                 jQuery("#discuss-nav").hide();
+                // 标签页重置显示第一个
+                var showDivId = "chat-chatgpt-content";
+                jQuery("#" + showDivId).show();    // 显示自己的内容
+                jQuery("#" + showDivId).siblings().hide();    // 隐藏所有同级 div 的内容
+                jQuery("#chat-nav").find("li").removeClass("layui-this");
+                jQuery("#chat-nav").find("li").eq(1).addClass("layui-this");
+                // 显示聊天文本框
+                jQuery("#footer-chat").show();
             },
             'draw-nav-show': function () {        // 显示绘画标签页
                 jQuery("#draw-nav").show();
                 jQuery("#chat-nav").hide();
                 jQuery("#discuss-nav").hide();
+                // 标签页重置显示第一个
+                var showDivId = "draw-chatgpt-content";
+                jQuery("#" + showDivId).show();    // 显示自己的内容
+                jQuery("#" + showDivId).siblings().hide();    // 隐藏所有同级 div 的内容
+                jQuery("#draw-nav").find("li").removeClass("layui-this");
+                jQuery("#draw-nav").find("li").eq(1).addClass("layui-this");
+                // 显示聊天文本框
+                jQuery("#footer-chat").show();
             },
             'nav-change-content': function (e) {   // 根据标签页切换显示不同的内容
                 var showDivId = jQuery(e).attr("lay-data");
