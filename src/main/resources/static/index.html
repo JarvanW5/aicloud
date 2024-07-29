@@ -18,10 +18,28 @@
             <li class="layui-nav-item layui-show-xs-inline-block layui-hide-sm" lay-header-event="menuLeft">
                 <i class="layui-icon layui-icon-spread-left"></i>
             </li>
-            <li class="layui-nav-item layui-hide-xs"><a href="javascript:;">ChatGPT</a></li>
-            <li class="layui-nav-item layui-hide-xs"><a href="javascript:;">通义千问</a></li>
-            <li class="layui-nav-item layui-hide-xs"><a href="javascript:;">讯飞星火</a></li>
-            <li class="layui-nav-item layui-hide-xs"><a href="javascript:;">文心一言</a></li>
+            <li class="layui-nav-item layui-hide-xs" lay-on="nav-change-content"
+                lay-data="chat-chatgpt-content"><a href="javascript:;">ChatGPT</a></li>
+            <li class="layui-nav-item layui-hide-xs" lay-on="nav-change-content"
+                lay-data="chat-tongyi-content"><a href="javascript:;">通义千问</a></li>
+            <li class="layui-nav-item layui-hide-xs" lay-on="nav-change-content"
+                lay-data="chat-xunfei-content"><a href="javascript:;">讯飞星火</a></li>
+            <li class="layui-nav-item layui-hide-xs" lay-on="nav-change-content"
+                lay-data="chat-wenxin-content"><a href="javascript:;">文心一言</a></li>
+        </ul>
+        <ul id="draw-nav" class="layui-nav layui-layout-left">
+            <!-- 移动端显示 -->
+            <li class="layui-nav-item layui-show-xs-inline-block layui-hide-sm" lay-header-event="menuLeft">
+                <i class="layui-icon layui-icon-spread-left"></i>
+            </li>
+            <li class="layui-nav-item layui-hide-xs" lay-on="nav-change-content"
+                lay-data="draw-chatgpt-content"><a href="javascript:;">ChatGPT</a></li>
+            <li class="layui-nav-item layui-hide-xs" lay-on="nav-change-content"
+                lay-data="draw-tongyi-content"><a href="javascript:;">通义千问</a></li>
+            <li class="layui-nav-item layui-hide-xs" lay-on="nav-change-content"
+                lay-data="draw-xunfei-content"><a href="javascript:;">讯飞星火</a></li>
+            <li class="layui-nav-item layui-hide-xs" lay-on="nav-change-content"
+                lay-data="draw-wenxin-content"><a href="javascript:;">文心一言</a></li>
         </ul>
         <ul id="discuss-nav" class="layui-nav layui-layout-left" style="display: none;">
             <!-- 移动端显示 -->
@@ -56,9 +74,9 @@
             <ul class="layui-nav layui-nav-tree" lay-filter="test">
                 <li class="layui-nav-item layui-nav-itemed">
                     <a class="" href="javascript:;">AI 工具箱</a>
-                    <dl class="layui-nav-child" lay-on="chat-nav-show">
-                        <dd><a href="javascript:;">对话</a></dd>
-                        <dd><a href="javascript:;">绘图</a></dd>
+                    <dl class="layui-nav-child">
+                        <dd><a href="javascript:;" lay-on="chat-nav-show">对话</a></dd>
+                        <dd><a href="javascript:;" lay-on="draw-nav-show">绘图</a></dd>
                     </dl>
                 </li>
                 <li class="layui-nav-item" lay-on="discuss-nav-show"><a href="javascript:;">话题讨论</a></li>
@@ -68,25 +86,76 @@
     </div>
     <div class="layui-body">
         <!-- 内容主体区域 -->
-        <div style="padding: 15px;">
-            <div class="layui-card layui-panel">
-                <div class="layui-card-header layui-font-16">
-                    我提出的问题？
+        <div>
+            <div style="padding: 15px;">
+                <div id="chat-chatgpt-content" class="layui-card layui-panel">
+                    <div class="layui-card-header layui-font-16">
+                        ChatGPT 提出的问题？
+                    </div>
+                    <div class="layui-card-body">
+                        ChatGPT 回答的答案
+                    </div>
                 </div>
-                <div class="layui-card-body">
-                    充数内容<br>你还真滑到了底部呀
+                <div id="chat-tongyi-content" class="layui-card layui-panel" style="display: none;">
+                    <div class="layui-card-header layui-font-16">
+                        tongyi 提出的问题？
+                    </div>
+                    <div class="layui-card-body">
+                        tongyi 回答的答案
+                    </div>
                 </div>
-            </div>
-            <div class="layui-card layui-panel">
-                <div class="layui-card-header layui-font-16">
-                    我提出的第二个问题？
+                <div id="chat-xunfei-content" class="layui-card layui-panel" style="display: none;">
+                    <div class="layui-card-header layui-font-16">
+                        xunnfei 提出的问题？
+                    </div>
+                    <div class="layui-card-body">
+                        xunfei 回答的答案
+                    </div>
                 </div>
-                <div class="layui-card-body">
-                    充数内容<br>你还真滑到了底部呀
+                <div id="chat-wenxin-content" class="layui-card layui-panel" style="display: none;">
+                    <div class="layui-card-header layui-font-16">
+                        wenxin 提出的问题？
+                    </div>
+                    <div class="layui-card-body">
+                        wenxin 回答的答案
+                    </div>
+                </div>
+                <div id="draw-chatgpt-content" class="layui-card layui-panel" style="display: none;">
+                    <div class="layui-card-header layui-font-16">
+                        绘图-ChatGPT 提出的问题？
+                    </div>
+                    <div class="layui-card-body">
+                        绘图-ChatGPT 回答的答案
+                    </div>
+                </div>
+                <div id="draw-tongyi-content" class="layui-card layui-panel" style="display: none;">
+                    <div class="layui-card-header layui-font-16">
+                        绘图-tongyi 提出的问题？
+                    </div>
+                    <div class="layui-card-body">
+                        绘图-tongyi 回答的答案
+                    </div>
+                </div>
+                <div id="draw-xunfei-content" class="layui-card layui-panel" style="display: none;">
+                    <div class="layui-card-header layui-font-16">
+                        绘图-xunnfei 提出的问题？
+                    </div>
+                    <div class="layui-card-body">
+                        绘图-xunfei 回答的答案
+                    </div>
+                </div>
+                <div id="draw-wenxin-content" class="layui-card layui-panel" style="display: none;">
+                    <div class="layui-card-header layui-font-16">
+                        绘图-wenxin 提出的问题？
+                    </div>
+                    <div class="layui-card-body">
+                        绘图-wenxin 回答的答案
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+
     <div class="layui-footer" style="height: 80px;line-height: 80px;">
         <!-- 底部固定区域 -->
         <div style="width: 80%">
@@ -111,15 +180,27 @@
         var $ = layui.$;
         var jQuery = layui.jquery;
 
-        util.on('lay-on',{
-            'discuss-nav-show': function () {
+        util.on('lay-on', {
+            'discuss-nav-show': function () {    // 显示话题讨论的标签页
                 jQuery("#chat-nav").hide();
+                jQuery("#draw-nav").hide();
                 jQuery("#discuss-nav").show();
             },
-            'chat-nav-show': function () {
+            'chat-nav-show': function () {        // 显示对话标签页
                 jQuery("#chat-nav").show();
+                jQuery("#draw-nav").hide();
                 jQuery("#discuss-nav").hide();
-            }
+            },
+            'draw-nav-show': function () {        // 显示绘画标签页
+                jQuery("#draw-nav").show();
+                jQuery("#chat-nav").hide();
+                jQuery("#discuss-nav").hide();
+            },
+            'nav-change-content': function (e) {   // 根据标签页切换显示不同的内容
+                var showDivId = jQuery(e).attr("lay-data");
+                jQuery("#" + showDivId).show();    // 显示自己的内容
+                jQuery("#" + showDivId).siblings().hide();    // 隐藏所有同级 div 的内容
+            },
         })
 
         //头部事件
