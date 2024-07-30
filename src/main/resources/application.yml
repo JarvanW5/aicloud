@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: aicloud
+  ai:
+    openai:
+      base-url: https://api.xiaoai.plus
+      api-key: sk-RmUvdTbuxullxBHE835904763d114d3187D1693052A0BaCb
