@@ -3,9 +3,12 @@ package org.spring.aicloud.controller;
 import cn.hutool.crypto.SecureUtil;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
+import org.spring.aicloud.entity.User;
+import org.spring.aicloud.service.IUserService;
 import org.spring.aicloud.util.ResponseEntity;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.StringUtils;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,6 +26,9 @@ public class UserController {
 
     @Resource
     private RedisTemplate redisTemplate;
+
+    @Resource
+    private IUserService userService;
 
     // 登录 login
     @RequestMapping("/login")
@@ -44,6 +50,21 @@ public class UserController {
             return ResponseEntity.success("登录成功");
         }
         return ResponseEntity.error("用户名或密码不正确");
+    }
+
+
+    /**
+     * 添加用户
+     */
+
+    @RequestMapping("/add")
+    public ResponseEntity add(User user) {
+
+        user = new User();
+        user.setUsername("admin");
+        user.setPassword("admin");
+        boolean result = userService.save(user);
+        return ResponseEntity.success("result: " + result);
     }
 
 }
