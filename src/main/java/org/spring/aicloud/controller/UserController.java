@@ -58,11 +58,7 @@ public class UserController {
      */
 
     @RequestMapping("/add")
-    public ResponseEntity add(User user) {
-
-        user = new User();
-        user.setUsername("admin");
-        user.setPassword("admin");
+    public ResponseEntity add(@Validated User user) {
         boolean result = userService.save(user);
         return ResponseEntity.success("result: " + result);
     }

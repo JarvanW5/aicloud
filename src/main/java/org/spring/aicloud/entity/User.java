@@ -5,9 +5,12 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.time.LocalDateTime;
 import java.io.Serializable;
+
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.apache.ibatis.annotations.Update;
 
 /**
  * <p>
@@ -28,17 +31,19 @@ public class User implements Serializable {
     /**
      * 主键
      */
-    @TableId(value = "uid", type = IdType.ASSIGN_ID)
+    @TableId(value = "uid", type = IdType.AUTO)
     private Long uid;
 
     /**
      * 用户名
      */
+    @NotBlank(message = "用户名不能为空")
     private String username;
 
     /**
      * 密码
      */
+    @NotBlank(message = "密码不能为空")
     private String password;
 
     /**
