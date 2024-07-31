@@ -5,3 +5,8 @@ spring:
     openai:
       base-url: https://api.xiaoai.plus/
       api-key: sk-RmUvdTbuxullxBHE835904763d114d3187D1693052A0BaCb
+minio:
+  endpoint: http://127.0.0.1:9000
+  access-key: 5l0FCQu8GH85djr3t8Q7
+  secret-key: AKL3Mz3uVXPuzcUWlaEnOz5owTjfBfBqIfY29IL5
+  bucket: aicloud
