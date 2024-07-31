@@ -1,5 +1,7 @@
 package org.spring.aicloud.util;
 
+import cn.hutool.captcha.CaptchaUtil;
+import cn.hutool.captcha.LineCaptcha;
 import io.minio.errors.*;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
@@ -21,6 +23,15 @@ class MinIoUtilTest {
     void upload() throws IOException, ServerException, InsufficientDataException, ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
         File file = new File("D:\\JarvanW\\workplace\\java_work\\develop\\test\\cat.png");
         InputStream inputStream = new FileInputStream(file);
-        System.out.println(minIoUtil.upload("cat.png",inputStream,"image/png"));
+        System.out.println(minIoUtil.upload("cat.png", inputStream, "image/png"));
+    }
+
+
+    @Test
+    void createCaptha() {
+        // 定义图形验证码的长和宽
+        LineCaptcha lineCaptcha = CaptchaUtil.createLineCaptcha(120, 40);
+        lineCaptcha.write("D:\\JarvanW\\workplace\\java_work\\develop\\test\\captcha.png");
+        System.out.println("验证码：" + lineCaptcha.getCode());
     }
 }
