@@ -300,16 +300,11 @@
                     area: ['560px', '400px'],
                     content: '/login.html',
                     fixed: false, // 不固定
-                    maxmin: true,
-                    shadeClose: true,
+                    title: '登录',
+                    maxmin: false,
+                    shadeClose: false,
                     btnAlign: 'c',
-                    yes: function(index, layero){
-                        // 获取 iframe 的窗口对象
-                        var iframeWin =  window[layero.find('iframe')[0]['name']];
-                        var elemMark = iframeWin.$('#mark'); // 获得 iframe 中某个输入框元素
-                        var value = elemMark.val();
-                        if($.trim(value) === '') return elemMark.focus();
-                    }
+                    move: false
                 });
             }
         });
