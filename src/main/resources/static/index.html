@@ -84,6 +84,9 @@
                 <li class="layui-nav-item" lay-on="discuss-nav-show"><a href="javascript:;">话题讨论</a></li>
                 <li class="layui-nav-item"><a href="javascript:;">关于</a></li>
             </ul>
+            <div style="position:absolute;bottom: 40px;text-align: center;width: 85%">
+                <button type="button" class="layui-btn layui-btn-lg" lay-on="doLogin"> 未登录 </button>
+            </div>
         </div>
     </div>
     <div class="layui-body">
@@ -290,6 +293,24 @@
                         }
                     });
                 }
+            },
+            'doLogin': function () {
+                layer.open({
+                    type: 2,
+                    area: ['560px', '400px'],
+                    content: '/login.html',
+                    fixed: false, // 不固定
+                    maxmin: true,
+                    shadeClose: true,
+                    btnAlign: 'c',
+                    yes: function(index, layero){
+                        // 获取 iframe 的窗口对象
+                        var iframeWin =  window[layero.find('iframe')[0]['name']];
+                        var elemMark = iframeWin.$('#mark'); // 获得 iframe 中某个输入框元素
+                        var value = elemMark.val();
+                        if($.trim(value) === '') return elemMark.focus();
+                    }
+                });
             }
         });
 
