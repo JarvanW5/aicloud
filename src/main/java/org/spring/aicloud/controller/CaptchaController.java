@@ -6,6 +6,7 @@ import cn.hutool.core.net.NetUtil;
 import io.minio.errors.*;
 import jakarta.annotation.Resource;
 import org.spring.aicloud.util.MinIoUtil;
+import org.spring.aicloud.util.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -33,7 +34,7 @@ public class CaptchaController {
      * 生成验证码
      */
     @RequestMapping("/create")
-    public String createCaptcha() throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+    public ResponseEntity createCaptcha() throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
         String url = "";
         // 定义图形验证码的长和宽
         LineCaptcha lineCaptcha = CaptchaUtil.createLineCaptcha(120, 40);
@@ -41,6 +42,6 @@ public class CaptchaController {
         try (InputStream inputStream = new ByteArrayInputStream(lineCaptcha.getImageBytes())) {
             url = minIoUtil.upload(fileName, inputStream, "image/png");
         }
-        return url;
+        return ResponseEntity.success(url);
     }
 }
