@@ -1,10 +1,13 @@
 package org.spring.aicloud.controller;
 
 import cn.hutool.crypto.SecureUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import org.spring.aicloud.entity.User;
+import org.spring.aicloud.entity.dto.UserDTO;
 import org.spring.aicloud.service.IUserService;
+import org.spring.aicloud.util.NameUtil;
 import org.spring.aicloud.util.ResponseEntity;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.StringUtils;
@@ -32,21 +35,19 @@ public class UserController {
 
     // 登录 login
     @RequestMapping("/login")
-    public ResponseEntity login(String username, String password, String captcha, HttpServletRequest request) {
-        // 1. 非空判断
-        if (!StringUtils.hasLength(username) || !StringUtils.hasLength(password) || !StringUtils.hasLength(captcha)) {
-            return ResponseEntity.error("参数有误！");
-        }
-
-        // 2. 验证图片验证码
-        String redisCaptchaKey = "captcha-" + SecureUtil.md5(request.getRemoteAddr());
+    public ResponseEntity login(@Validated UserDTO userDTO, HttpServletRequest request) {
+        // 1. 验证图片验证码
+        String redisCaptchaKey = NameUtil.getCaptchaName(request);
         String redisCaptcha = (String) redisTemplate.opsForValue().get(redisCaptchaKey);
-        if (!StringUtils.hasLength(redisCaptcha) || !redisCaptcha.equalsIgnoreCase(captcha)) {
+        if (!StringUtils.hasLength(redisCaptcha) || !redisCaptcha.equalsIgnoreCase(userDTO.getCaptcha())) {
             return ResponseEntity.error("输入验证码错误，请重新输入！");
         }
 
-        // 3. 验证用户名密码
-        if ("admin".equals(username) && "admin".equals(password)) {
+        // 2. 验证用户名密码
+        QueryWrapper<User> querywrapper = new QueryWrapper<>();
+        querywrapper.eq("username", userDTO.getUsername());
+        User user = userService.getOne(querywrapper);
+        if (user != null && user.getPassword().equals(userDTO.getPassword())){
             return ResponseEntity.success("登录成功");
         }
         return ResponseEntity.error("用户名或密码不正确");

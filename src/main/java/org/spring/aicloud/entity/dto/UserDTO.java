@@ -1,0 +1,22 @@
+package org.spring.aicloud.entity.dto;
+
+import jakarta.validation.constraints.NotBlank;
+import lombok.Data;
+import org.spring.aicloud.entity.User;
+
+import java.io.Serial;
+import java.io.Serializable;
+
+/**
+ * @Author: JarvanW
+ * @Date: 2024/8/1
+ * @Description:
+ * @Requirements:
+ */
+@Data
+public class UserDTO extends User implements Serializable {
+    @Serial
+    private static final long serialVersionUID = -3283328906330311223L;
+    @NotBlank(message = "验证码不能为空")
+    private String captcha;
+}
