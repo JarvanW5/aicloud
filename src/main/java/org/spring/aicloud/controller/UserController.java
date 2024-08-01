@@ -33,7 +33,13 @@ public class UserController {
     @Resource
     private IUserService userService;
 
-    // 登录 login
+    /**
+     * 登录方法
+     *
+     * @param userDTO
+     * @param request
+     * @return
+     */
     @RequestMapping("/login")
     public ResponseEntity login(@Validated UserDTO userDTO, HttpServletRequest request) {
         // 1. 验证图片验证码
@@ -47,7 +53,7 @@ public class UserController {
         QueryWrapper<User> querywrapper = new QueryWrapper<>();
         querywrapper.eq("username", userDTO.getUsername());
         User user = userService.getOne(querywrapper);
-        if (user != null && user.getPassword().equals(userDTO.getPassword())){
+        if (user != null && user.getPassword().equals(userDTO.getPassword())) {
             return ResponseEntity.success("登录成功");
         }
         return ResponseEntity.error("用户名或密码不正确");
@@ -55,13 +61,16 @@ public class UserController {
 
 
     /**
-     * 添加用户
+     * 注册功能
      */
 
-    @RequestMapping("/add")
-    public ResponseEntity add(@Validated User user) {
+    @RequestMapping("/register")
+    public ResponseEntity rsgister(@Validated User user) {
         boolean result = userService.save(user);
-        return ResponseEntity.success("result: " + result);
+        if (result){
+            return ResponseEntity.success("注册成功");
+        }
+        return ResponseEntity.error("注册失败");
     }
 
 }

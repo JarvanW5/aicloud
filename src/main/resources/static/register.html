@@ -19,7 +19,7 @@
                 <div class="layui-input-prefix">
                     <i class="layui-icon layui-icon-username"></i>
                 </div>
-                <input type="text" name="nickname" value="" lay-verify="required" placeholder="用户名" autocomplete="off" class="layui-input" lay-affix="clear">
+                <input type="text" name="username" value="" lay-verify="required" placeholder="用户名" autocomplete="off" class="layui-input" lay-affix="clear">
             </div>
         </div>
         <div class="layui-form-item">
@@ -64,7 +64,7 @@
 <script src="/layui/layui.js"></script>
 <script>
     layui.use(function(){
-        var $ = layui.$;
+        var jQuery = layui.$;
         var form = layui.form;
         var layer = layui.layer;
         var util = layui.util;
@@ -73,7 +73,7 @@
         form.verify({
             // 确认密码
             confirmPassword: function(value, item){
-                var passwordValue = $('#reg-password').val();
+                var passwordValue = jQuery('#reg-password').val();
                 if(value !== passwordValue){
                     return '两次密码输入不一致';
                 }
@@ -90,7 +90,19 @@
                 return false;
             }
             // 此处可执行 Ajax 等操作
-            // …
+            jQuery.ajax({
+                url: '/user/register',
+                type: 'POST',
+                data: field,
+                success: function (res) {
+                    if (res.code === 200) {
+                        // 注册成功
+                        layer.msg("注册成功！");
+                    } else {
+                        layer.msg("注册失败：" + res.msg);
+                    }
+                }
+            });
             return false; // 阻止默认 form 跳转
         });
 
