@@ -1,6 +1,7 @@
 package org.spring.aicloud.controller;
 
 import cn.hutool.crypto.SecureUtil;
+import cn.hutool.jwt.JWTUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
@@ -9,11 +10,14 @@ import org.spring.aicloud.entity.dto.UserDTO;
 import org.spring.aicloud.service.IUserService;
 import org.spring.aicloud.util.NameUtil;
 import org.spring.aicloud.util.ResponseEntity;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashMap;
 
 /**
  * @Author: JarvanW
@@ -32,6 +36,9 @@ public class UserController {
 
     @Resource
     private IUserService userService;
+
+    @Value("${jwt.secret}")
+    private String jwtsecret;
 
     /**
      * 登录方法
@@ -54,7 +61,11 @@ public class UserController {
         querywrapper.eq("username", userDTO.getUsername());
         User user = userService.getOne(querywrapper);
         if (user != null && user.getPassword().equals(userDTO.getPassword())) {
-            return ResponseEntity.success("登录成功");
+            // 生成JWT
+            HashMap<String, Object> payLoad = new HashMap<>();
+            payLoad.put("uid",user.getUid());
+            payLoad.put("username",user.getUsername());
+            return ResponseEntity.success(JWTUtil.createToken(payLoad,jwtsecret.getBytes()));
         }
         return ResponseEntity.error("用户名或密码不正确");
     }
@@ -67,7 +78,7 @@ public class UserController {
     @RequestMapping("/register")
     public ResponseEntity rsgister(@Validated User user) {
         boolean result = userService.save(user);
-        if (result){
+        if (result) {
             return ResponseEntity.success("注册成功");
         }
         return ResponseEntity.error("注册失败");

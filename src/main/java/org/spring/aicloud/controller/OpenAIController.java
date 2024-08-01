@@ -1,6 +1,7 @@
 package org.spring.aicloud.controller;
 
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
 import org.spring.aicloud.util.ResponseEntity;
 import org.springframework.ai.image.ImagePrompt;
 import org.springframework.ai.image.ImageResponse;
