@@ -45,6 +45,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)          // 禁用 CSRF 验证
                 .formLogin(AbstractHttpConfigurer::disable)          // 禁用默认登录页面
                 .logout(AbstractHttpConfigurer::disable)         // 禁用默认注销页
+                .headers(AbstractHttpConfigurer::disable)         // 禁用默认的 Header （支持 iframe 访问页面）
                 .sessionManagement(session ->                      // 禁用 Session （项目中使用了 JWT 认证）
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth ->
@@ -53,6 +54,7 @@ public class SecurityConfig {
                                         "/layui/js/**",
                                         "/layui/css/**",
                                         "/login.html",
+                                        "/index.html",
                                         "/register.html",
                                         "/user/login",
                                         "/user/register",

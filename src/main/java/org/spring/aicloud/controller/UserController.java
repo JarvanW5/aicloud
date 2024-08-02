@@ -12,6 +12,7 @@ import org.spring.aicloud.util.NameUtil;
 import org.spring.aicloud.util.ResponseEntity;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,6 +31,8 @@ import java.util.HashMap;
 @RequestMapping("/user")
 public class UserController {
 
+    @Resource
+    private PasswordEncoder passwordEncoder;
 
     @Resource
     private RedisTemplate redisTemplate;
@@ -60,7 +63,8 @@ public class UserController {
         QueryWrapper<User> querywrapper = new QueryWrapper<>();
         querywrapper.eq("username", userDTO.getUsername());
         User user = userService.getOne(querywrapper);
-        if (user != null && user.getPassword().equals(userDTO.getPassword())) {
+        if (user != null && passwordEncoder.matches(userDTO.getPassword(),
+                user.getPassword())) {
             // 生成JWT
             HashMap<String, Object> payLoad = new HashMap<>();
             payLoad.put("uid",user.getUid());
@@ -77,6 +81,10 @@ public class UserController {
 
     @RequestMapping("/register")
     public ResponseEntity rsgister(@Validated User user) {
+        // 将密码进行加盐处理
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        // 添加方法
+
         boolean result = userService.save(user);
         if (result) {
             return ResponseEntity.success("注册成功");
