@@ -84,4 +84,10 @@ public class UserController {
         return ResponseEntity.error("注册失败");
     }
 
+    @RequestMapping("/test")
+    public String test() {
+
+        return "OK";
+    }
+
 }
