@@ -52,16 +52,17 @@
                 lay-data="discuss-content-new"><a href="javascript:;">最新</a></li>
         </ul>
         <ul class="layui-nav layui-layout-right">
-            <li class="layui-nav-item layui-hide layui-show-sm-inline-block">
-                <a href="javascript:;">
-                    <img src="//unpkg.com/outeres@0.0.10/img/layui/icon-v2.png" class="layui-nav-img">
-                    tester
-                </a>
-                <dl class="layui-nav-child">
-                    <dd><a href="javascript:;">Your Profile</a></dd>
-                    <dd><a href="javascript:;">Settings</a></dd>
-                    <dd><a href="javascript:;">Sign out</a></dd>
-                </dl>
+            <li  class="layui-nav-item layui-hide layui-show-sm-inline-block">
+                <div id="user-info">
+                    <a href="javascript:;">
+                        <img src="//unpkg.com/outeres@0.0.10/img/layui/icon-v2.png" class="layui-nav-img">
+                        <span id="username_span"></span>
+                    </a>
+                    <dl class="layui-nav-child">
+                        <dd><a href="javascript:;">设置</a></dd>
+                        <dd lay-on="logout"><a href="javascript:;">退出</a></dd>
+                    </dl>
+                </div>
             </li>
             <li class="layui-nav-item" lay-header-event="menuRight" lay-unselect>
                 <a href="javascript:;">
@@ -84,7 +85,7 @@
                 <li class="layui-nav-item" lay-on="discuss-nav-show"><a href="javascript:;">话题讨论</a></li>
                 <li class="layui-nav-item"><a href="javascript:;">关于</a></li>
             </ul>
-            <div style="position:absolute;bottom: 40px;text-align: center;width: 85%">
+            <div id="unlogin_btn_div" style="position:absolute;bottom: 40px;text-align: center;width: 85%">
                 <button type="button" class="layui-btn layui-btn-lg" lay-on="doLogin"> 未登录</button>
             </div>
         </div>
@@ -180,6 +181,7 @@
 
 <script src="/layui/layui.js"></script>
 <script src="layui/js/ajaxutil.js"></script>
+<script src="layui/js/appvariable.js"></script>
 <script>
     //JS
     layui.use(['element', 'layer', 'util'], function () {
@@ -188,6 +190,26 @@
         var util = layui.util;
         var jQuery = layui.$;
         var question_type = "chat";       // 默认当前在使用聊天
+
+
+        // 登录状态的判断
+        function isLogin() {
+            if (layui.data(login_user_info_key).authorization) {
+                // 登录状态
+                jQuery("#unlogin_btn_div").hide();
+                jQuery("#username_span").html(layui.data(login_user_info_key).username);
+            }else {    // 未登录状态
+                jQuery("#unlogin_btn_div").show();
+                jQuery("#user-info").hide();
+            }
+        }
+
+        // 页面加载完成之后执行的初始化事件
+        layer.ready(function () {
+            // 登录状态判断
+            isLogin();
+
+        });
 
         util.on('lay-on', {
             'discuss-nav-show': function () {    // 显示话题讨论的标签页
@@ -281,6 +303,7 @@
                             layer.msg(res.msg);
                         }
                     }
+
                     authAjax(jQuery, '/openai/draw', {question: question}, callback);
                 }
             },
@@ -295,6 +318,19 @@
                     shadeClose: false,
                     btnAlign: 'c',
                     move: false
+                });
+            },
+            'logout': function () {
+                layer.confirm('确认退出？', {
+                    btn: ['确定', '关闭'], //按钮
+                    title: "退出",
+                    move: false
+                }, function (index) {
+                    // 执行退出操作
+                    layui.data(login_user_info_key, null);
+                    isLogin();
+                    layer.close(index);
+                }, function () {
                 });
             }
         });

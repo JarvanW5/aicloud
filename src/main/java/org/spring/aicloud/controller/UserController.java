@@ -69,7 +69,10 @@ public class UserController {
             HashMap<String, Object> payLoad = new HashMap<>();
             payLoad.put("uid",user.getUid());
             payLoad.put("username",user.getUsername());
-            return ResponseEntity.success(JWTUtil.createToken(payLoad,jwtsecret.getBytes()));
+            HashMap<String, String> result = new HashMap<>();
+            result.put("jwt",JWTUtil.createToken(payLoad,jwtsecret.getBytes()));
+            result.put("username", user.getUsername());
+            return ResponseEntity.success(result);
         }
         return ResponseEntity.error("用户名或密码不正确");
     }
