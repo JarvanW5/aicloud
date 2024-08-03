@@ -2,7 +2,10 @@ package org.spring.aicloud.controller;
 
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
+import org.spring.aicloud.entity.Answer;
+import org.spring.aicloud.service.IAnswerService;
 import org.spring.aicloud.util.ResponseEntity;
+import org.spring.aicloud.util.SecurityUtil;
 import org.springframework.ai.image.ImagePrompt;
 import org.springframework.ai.image.ImageResponse;
 import org.springframework.ai.openai.OpenAiChatModel;
@@ -27,6 +30,8 @@ public class OpenAIController {
     private OpenAiChatModel chatModel;
     @Resource
     private OpenAiImageModel imageModel;
+    @Resource
+    private IAnswerService answerService;
 
 
     /**
@@ -43,7 +48,21 @@ public class OpenAIController {
         }
         // 调用 Open AI 接口
         String result = chatModel.call(question);
-        return ResponseEntity.success(result);
+        // 将结果保存到数据库
+        Answer answer = new Answer();
+        answer.setTitle(question);
+        answer.setContent(result);
+        answer.setModel(1);
+        answer.setType(1);
+        answer.setUid(SecurityUtil.getCurrentUser().getUid());
+
+
+        boolean addResult = answerService.save(answer);
+        if (addResult) {
+            return ResponseEntity.success(result);
+        }
+
+        return ResponseEntity.error("数据保存失败，请重试！");
     }
 
     @RequestMapping("/draw")
@@ -54,6 +73,23 @@ public class OpenAIController {
         }
         // 调用 Open AI 接口
         ImageResponse result = imageModel.call(new ImagePrompt(question));
-        return ResponseEntity.success(result.getResults().get(0));
+        String imgUrl = result.getResult().getOutput().getUrl();
+
+
+        // 将结果保存到数据库
+        Answer answer = new Answer();
+        answer.setTitle(question);
+        answer.setContent(imgUrl);
+        answer.setModel(1);
+        answer.setType(2);
+        answer.setUid(SecurityUtil.getCurrentUser().getUid());
+
+
+        boolean addResult = answerService.save(answer);
+        if (addResult) {
+            return ResponseEntity.success(imgUrl);
+        }
+
+        return ResponseEntity.error("数据保存失败，请重试！");
     }
 }

@@ -52,7 +52,7 @@
                 lay-data="discuss-content-new"><a href="javascript:;">最新</a></li>
         </ul>
         <ul class="layui-nav layui-layout-right">
-            <li  class="layui-nav-item layui-hide layui-show-sm-inline-block">
+            <li class="layui-nav-item layui-hide layui-show-sm-inline-block">
                 <div id="user-info">
                     <a href="javascript:;">
                         <img src="//unpkg.com/outeres@0.0.10/img/layui/icon-v2.png" class="layui-nav-img">
@@ -170,7 +170,7 @@
                        placeholder="输入问题"
                        class="layui-input">
                 <div class="layui-input-suffix">
-                    <button type="button" style="margin-left: 60px;" lay-on="question-send"
+                    <button id="question-send" type="button" style="margin-left: 60px;" lay-on="question-send"
                             class="layui-btn layui-btn-radius">发送
                     </button>
                 </div>
@@ -198,9 +198,13 @@
                 // 登录状态
                 jQuery("#unlogin_btn_div").hide();
                 jQuery("#username_span").html(layui.data(login_user_info_key).username);
-            }else {    // 未登录状态
+                jQuery("#question-input").removeAttr("disabled", "disabled");
+                jQuery("#question-send").removeAttr("disabled", "disabled");
+            } else {    // 未登录状态
                 jQuery("#unlogin_btn_div").show();
                 jQuery("#user-info").hide();
+                jQuery("#question-input").attr("disabled", "disabled");
+                jQuery("#question-send").attr("disabled", "disabled");
             }
         }
 
@@ -280,7 +284,7 @@
                             jQuery("#chat-chatgpt-content").prepend(createHtml);
                             jQuery("question-input").val("");
                         } else {
-                            layer.msg(res.msg);
+                            layer.msg("出错了：" + res.msg);
                         }
                     }
 
@@ -299,8 +303,9 @@
                                 '">                        </div>\n' +
                                 '                    </div>';
                             jQuery("#draw-chatgpt-content").prepend(createHtml);
+                            jQuery("question-input").val("");
                         } else {
-                            layer.msg(res.msg);
+                            layer.msg("出错了：" + res.msg);
                         }
                     }
 
