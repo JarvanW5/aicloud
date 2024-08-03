@@ -190,6 +190,7 @@
         var util = layui.util;
         var jQuery = layui.$;
         var question_type = "chat";       // 默认当前在使用聊天
+        var is_first_load_draw = true;    // 是否首次加载绘图历史列表
 
 
         // 登录状态的判断
@@ -208,10 +209,89 @@
             }
         }
 
+        // 封装问答 HTML 代码
+        function createChatHtml(question, answer) {
+            return '<div class="layui-card layui-panel">\n' +
+                '                        <div class="layui-card-header layui-font-16">\n' +
+                question + '                            \n' +
+                '                        </div>\n' +
+                '                        <div class="layui-card-body">\n' +
+                answer + '                            \n' +
+                '                        </div>\n' +
+                '                    </div>';
+        }
+
+        // 封装绘图 HTML 代码
+        function createDrawHtml(question, answer) {
+            return '<div class="layui-card layui-panel">\n' +
+                '                        <div class="layui-card-header layui-font-16">\n' +
+                question + '                            \n' +
+                '                        </div>\n' +
+                '                        <div class="layui-card-body">\n<img src="' +
+                answer + '">                            \n' +
+                '                        </div>\n' +
+                '                    </div>';
+        }
+
+        // 显示OpenAI历史对话列表
+        function showOpenAIChatHistory() {
+            // 回调显示方法
+            function doShowList(res) {
+                if (res.code === 200) {
+                    var html = "";
+                    for (var i = 0; i < res.data.length; i++) {
+                        var answer = res.data[i];
+                        html += createChatHtml(answer.title, answer.content);
+                    }
+                    jQuery("#chat-chatgpt-content").html(html);
+                }
+            }
+
+            authAjax(jQuery, "/openai/getchatlist", {}, doShowList);
+        }
+
+        // 显示OpenAI历史绘图列表
+        function showOpenAIDrawHistory() {
+            if (is_first_load_draw) {
+                // 回调显示方法
+                function doShowList(res) {
+                    if (res.code === 200) {
+                        var html = "";
+                        for (var i = 0; i < res.data.length; i++) {
+                            var answer = res.data[i];
+                            html += createDrawHtml(answer.title, answer.content);
+                        }
+                        jQuery("#draw-chatgpt-content").html(html);
+                    }
+                }
+
+                authAjax(jQuery, "/openai/getdrawlist", {}, doShowList);
+                is_first_load_draw = false;
+            }
+        }
+        
+        // 调用 OpenAI 聊天
+        function doOpenAIChat() {
+            function callback(res) {
+                // 显示回答
+                if (res.code == 200) {
+                    // 正常返回响应信息，显示回答
+                    jQuery("#chat-chatgpt-content").prepend(
+                        createChatHtml(question, res.data));
+                    jQuery("#question-input").val("");
+                } else {
+                    layer.msg("出错了：" + res.msg);
+                }
+            }
+            authAjax(jQuery, '/openai/chat', {question: question}, callback);
+        }
+
         // 页面加载完成之后执行的初始化事件
         layer.ready(function () {
             // 登录状态判断
             isLogin();
+            // 显示对话的历史问答信息
+            showOpenAIChatHistory();
 
         });
 
@@ -256,6 +336,8 @@
                 // 显示聊天文本框
                 jQuery("#footer-chat").show();
                 question_type = "draw";
+                // 显示历史绘图信息
+                showOpenAIDrawHistory();
             },
             'nav-change-content': function (e) {   // 根据标签页切换显示不同的内容
                 var showDivId = jQuery(e).attr("lay-data");
@@ -269,41 +351,15 @@
                     return;
                 }
                 if (question_type == "chat") {     // 对话功能
-                    function callback(res) {
-                        // 显示回答
-                        if (res.code == 200) {
-                            // 正常返回响应信息，显示回答
-                            var createHtml = '<div class="layui-card layui-panel">\n' +
-                                '                        <div class="layui-card-header layui-font-16">\n' +
-                                question + '                            \n' +
-                                '                        </div>\n' +
-                                '                        <div class="layui-card-body">\n' +
-                                res.data + '                            \n' +
-                                '                        </div>\n' +
-                                '                    </div>';
-                            jQuery("#chat-chatgpt-content").prepend(createHtml);
-                            jQuery("question-input").val("");
-                        } else {
-                            layer.msg("出错了：" + res.msg);
-                        }
-                    }
-
-                    authAjax(jQuery, '/openai/chat', {question: question}, callback);
+                    doOpenAIChat(question);   // 调用 OpenAI 聊天功能
                 } else if (question_type == "draw") {   // 绘图功能
                     function callback() {
                         // 显示答案
                         if (res.code == 200) {
                             // 正常返回响应信息，显示回答
-                            var createHtml = '<div class="layui-card layui-panel">\n' +
-                                '                        <div class="layui-card-header layui-font-16">\n' +
-                                question + '                            \n' +
-                                '                        </div>\n' +
-                                '                        <div class="layui-card-body">\n<img src="' +
-                                res.data.output.url + '                            \n' +
-                                '">                        </div>\n' +
-                                '                    </div>';
-                            jQuery("#draw-chatgpt-content").prepend(createHtml);
-                            jQuery("question-input").val("");
+                            jQuery("#draw-chatgpt-content").prepend(
+                                createDrawHtml(question, res.data));
+                            jQuery("#question-input").val("");
                         } else {
                             layer.msg("出错了：" + res.msg);
                         }
@@ -317,7 +373,7 @@
                     type: 2,
                     area: ['560px', '400px'],
                     content: '/login.html',
-                    fixed: false, // 不固定
+                    fixed: true, // 不固定
                     title: '登录',
                     maxmin: false,
                     shadeClose: false,

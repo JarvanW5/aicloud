@@ -58,7 +58,9 @@ public class SecurityConfig {
                                         "/register.html",
                                         "/user/login",
                                         "/user/register",
-                                        "/captcha/create"
+                                        "/captcha/create",
+                                        "/tongyi/chat",
+                                        "/tongyi/draw"
                                 ).permitAll()
                                 .anyRequest().authenticated()         // 其他请求都需要认证拦截
                 )
