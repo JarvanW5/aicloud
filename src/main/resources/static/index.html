@@ -27,7 +27,7 @@
             <li class="layui-nav-item layui-hide-xs" lay-on="nav-change-content"
                 lay-data="chat-wenxin-content"><a href="javascript:;">文心一言</a></li>
         </ul>
-        <ul id="draw-nav" class="layui-nav layui-layout-left">
+        <ul id="draw-nav" class="layui-nav layui-layout-left" style="display: none;">
             <!-- 移动端显示 -->
             <li class="layui-nav-item layui-show-xs-inline-block layui-hide-sm" lay-header-event="menuLeft">
                 <i class="layui-icon layui-icon-spread-left"></i>
@@ -228,21 +228,36 @@
                 '                    </div>';
         }
 
+        // 封装基础聊天功能统一和展示方法
+        function baseChatShowList(divId, res) {
+            if (res.code === 200) {
+                var html = "";
+                for (var i = 0; i < res.data.length; i++) {
+                    var answer = res.data[i];
+                    html += createChatHtml(answer.title, answer.content);
+                }
+                jQuery("#" + divId).html(html);
+            }
+        }
+
         // 显示OpenAI历史对话列表
         function showOpenAIChatHistory() {
             // 回调显示方法
             function doShowList(res) {
-                if (res.code === 200) {
-                    var html = "";
-                    for (var i = 0; i < res.data.length; i++) {
-                        var answer = res.data[i];
-                        html += createChatHtml(answer.title, answer.content);
-                    }
-                    jQuery("#chat-chatgpt-content").html(html);
-                }
+                baseChatShowList("chat-openai-content", res);
             }
 
             authAjax(jQuery, "/openai/getchatlist", {}, doShowList);
+        }
+
+        // 获取通义大模型历史对话信息
+        function showTongyiChatHistory() {
+            // 回调显示方法
+            function doShowList(res) {
+                baseChatShowList("chat-tongyi-content", res);
+            }
+
+            authAjax(jQuery, "/tongyi/getchatlist", {}, doShowList);
         }
 
         // 显示OpenAI历史绘图列表
@@ -303,6 +318,8 @@
             isLogin();
             // 显示对话的历史问答信息
             showOpenAIChatHistory();
+            // 通义大模型历史对话信息
+            showTongyiChatHistory();
 
         });
 

@@ -4,6 +4,7 @@ import com.alibaba.cloud.ai.tongyi.chat.TongYiChatClient;
 import com.alibaba.cloud.ai.tongyi.chat.TongYiChatOptions;
 import com.alibaba.cloud.ai.tongyi.image.TongYiImagesClient;
 import com.alibaba.cloud.ai.tongyi.image.TongYiImagesOptions;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import jakarta.annotation.Resource;
 import org.spring.aicloud.entity.Answer;
 import org.spring.aicloud.service.IAnswerService;
@@ -14,6 +15,9 @@ import org.springframework.ai.image.ImagePrompt;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.awt.*;
+import java.util.List;
 
 /**
  * @Author: JarvanW
@@ -79,5 +83,21 @@ public class TongyiController {
         String result = imageClient.call(new ImagePrompt(question))
                 .getResult().getOutput().getUrl();
         return ResponseEntity.success(result);
+    }
+
+    /**
+     * 获取聊天列表
+     */
+
+    @RequestMapping("/getchatlist")
+    public ResponseEntity getChatList() {
+
+        QueryWrapper<Answer> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("model", 2);
+        queryWrapper.eq("type", 1);
+        queryWrapper.eq("uid", SecurityUtil.getCurrentUser().getUid());
+        queryWrapper.orderByDesc("createtime");
+        List<Answer> list = answerService.list(queryWrapper);
+        return ResponseEntity.success(list);
     }
 }
