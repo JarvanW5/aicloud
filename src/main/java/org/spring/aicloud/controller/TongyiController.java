@@ -97,7 +97,7 @@ public class TongyiController {
     }
 
     /**
-     * 获取聊天列表
+     * 获取聊天历史列表
      */
 
     @RequestMapping("/getchatlist")
@@ -107,7 +107,23 @@ public class TongyiController {
         queryWrapper.eq("model", 2);
         queryWrapper.eq("type", 1);
         queryWrapper.eq("uid", SecurityUtil.getCurrentUser().getUid());
-        queryWrapper.orderByDesc("createtime");
+        queryWrapper.orderByDesc("aid");
+        List<Answer> list = answerService.list(queryWrapper);
+        return ResponseEntity.success(list);
+    }
+
+
+    /**
+     * 获取绘画历史列表
+     */
+    @RequestMapping("/getdrawlist")
+    public ResponseEntity getDrawList() {
+
+        QueryWrapper<Answer> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("model", 2);         // todo:后面优化成枚举
+        queryWrapper.eq("type", 2);          // todo:后面优化成枚举
+        queryWrapper.eq("uid", SecurityUtil.getCurrentUser().getUid());
+        queryWrapper.orderByDesc("aid");
         List<Answer> list = answerService.list(queryWrapper);
         return ResponseEntity.success(list);
     }

@@ -180,7 +180,8 @@
         var util = layui.util;
         var jQuery = layui.$;
         var question_type = "chat";       // 默认当前在使用聊天
-        var is_first_load_draw = true;    // 是否首次加载绘图历史列表
+        var is_first_load_draw_openai = true;    // 是否首次加载绘图历史列表
+        var is_first_load_draw_tongyi = true;    // 是否首次加载绘图历史列表
 
 
         // 登录状态的判断
@@ -256,23 +257,42 @@
             authAjax(jQuery, "/tongyi/getchatlist", {}, doShowList);
         }
 
+        // 绘图功能历史信息基础方法封装
+        function baseDrawShowList(divId, res) {
+            if (res.code === 200) {
+                var html = "";
+                for (var i = 0; i < res.data.length; i++) {
+                    var answer = res.data[i];
+                    html += createDrawHtml(answer.title, answer.content);
+                }
+                jQuery("#" + divId).html(html);
+            }
+
+        }
+
         // 显示OpenAI历史绘图列表
         function showOpenAIDrawHistory() {
-            if (is_first_load_draw) {
+            if (is_first_load_draw_openai) {
                 // 回调显示方法
                 function doShowList(res) {
-                    if (res.code === 200) {
-                        var html = "";
-                        for (var i = 0; i < res.data.length; i++) {
-                            var answer = res.data[i];
-                            html += createDrawHtml(answer.title, answer.content);
-                        }
-                        jQuery("#draw-chatgpt-content").html(html);
-                    }
+                    baseDrawShowList("draw-openai-content", res);
                 }
 
                 authAjax(jQuery, "/openai/getdrawlist", {}, doShowList);
-                is_first_load_draw = false;
+                is_first_load_draw_openai = false;
+            }
+        }
+
+        // 显示通义大模型历史绘图列表
+        function showTongyiDrawHistory() {
+            if (is_first_load_draw_tongyi) {
+                // 回调显示方法
+                function doShowList(res) {
+                    baseDrawShowList("draw-tongyi-content", res);
+                }
+
+                authAjax(jQuery, "/tongyi/getdrawlist", {}, doShowList);
+                is_first_load_draw_tongyi = false;
             }
         }
 
@@ -391,8 +411,10 @@
                 // 显示聊天文本框
                 jQuery("#footer-chat").show();
                 question_type = "draw";
-                // 显示历史绘图信息
+                // 显示 openai 历史绘图信息
                 showOpenAIDrawHistory();
+                // 通义大模型历史绘图信息
+                showTongyiDrawHistory();
             },
             'nav-change-content': function (e) {   // 根据标签页切换显示不同的内容
                 var showDivId = jQuery(e).attr("lay-data");
