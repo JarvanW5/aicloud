@@ -82,7 +82,18 @@ public class TongyiController {
         }
         String result = imageClient.call(new ImagePrompt(question))
                 .getResult().getOutput().getUrl();
-        return ResponseEntity.success(result);
+
+        Answer answer = new Answer();
+        answer.setTitle(question);
+        answer.setContent(result);
+        answer.setModel(2);          // todo:后面优化成枚举
+        answer.setUid(SecurityUtil.getCurrentUser().getUid());
+        answer.setType(2);           // todo:后面优化成枚举
+        boolean saveResult = answerService.save(answer);
+        if (saveResult) {
+            return ResponseEntity.success(result);
+        }
+        return ResponseEntity.error("保存失败,请重试！");
     }
 
     /**

@@ -120,12 +120,7 @@
 
                 </div>
                 <div id="draw-tongyi-content" class="layui-card layui-panel" style="display: none;">
-                    <div class="layui-card-header layui-font-16">
-                        绘图-tongyi 提出的问题？
-                    </div>
-                    <div class="layui-card-body">
-                        绘图-tongyi 回答的答案
-                    </div>
+
                 </div>
                 <div id="draw-xunfei-content" style="display: none;">
 
@@ -240,6 +235,7 @@
             }
         }
 
+
         // 显示OpenAI历史对话列表
         function showOpenAIChatHistory() {
             // 回调显示方法
@@ -312,6 +308,37 @@
             authAjax(jQuery, '/tongyi/chat', {question: question}, callback);
         }
 
+        // 封装绘图公共回调方法
+        function baseDrawCallback(divId, question, res) {
+            // 显示答案
+            if (res.code == 200) {
+                // 正常返回响应信息，显示回答
+                jQuery("#" + divId).prepend(
+                    createDrawHtml(question, res.data));
+                jQuery("#question-input").val("");
+            } else {
+                layer.msg("出错了：" + res.msg);
+            }
+        }
+
+        // 调用 OpenAI 绘图功能
+        function doOpenAIDraw(question) {
+            function callback(res) {
+                baseDrawCallback("draw-chatgpt-content", question, res);
+            }
+
+            authAjax(jQuery, '/openai/draw', {question: question}, callback);
+        }
+
+        // 调用通义大模型绘图功能
+        function doTongyiDraw(question) {
+            function callback(res) {
+                baseDrawCallback("draw-tongyi-content", question, res);
+            }
+
+            authAjax(jQuery, '/tongyi/draw', {question: question}, callback);
+        }
+
         // 页面加载完成之后执行的初始化事件
         layer.ready(function () {
             // 登录状态判断
@@ -382,19 +409,8 @@
                     // doOpenAIChat(question);   // 调用 OpenAI 聊天功能
                     doTongyiChat(question);      // 调用通义大模型的聊天功能
                 } else if (question_type == "draw") {   // 绘图功能
-                    function callback() {
-                        // 显示答案
-                        if (res.code == 200) {
-                            // 正常返回响应信息，显示回答
-                            jQuery("#draw-chatgpt-content").prepend(
-                                createDrawHtml(question, res.data));
-                            jQuery("#question-input").val("");
-                        } else {
-                            layer.msg("出错了：" + res.msg);
-                        }
-                    }
-
-                    authAjax(jQuery, '/openai/draw', {question: question}, callback);
+                    // doOpenAIDraw(question);      // 调用 OpenAI 绘图功能
+                    doTongyiDraw(question);         // 调用通义大模型的绘图功能
                 }
             },
             'doLogin': function () {
