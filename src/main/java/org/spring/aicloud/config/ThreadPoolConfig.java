@@ -11,6 +11,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
+import java.util.concurrent.RejectedExecutionHandler;
+import java.util.concurrent.ThreadPoolExecutor;
+
 /**
  * 创建线程池
  */
@@ -25,8 +28,20 @@ public class ThreadPoolConfig {
         executor.setMaxPoolSize(Runtime.getRuntime().availableProcessors() * 2 + 1);
         // 任务队列容量
         executor.setQueueCapacity(100000);
-        executor.setThreadNamePrefix("thread-pool-");
+        // 执行自定义拒绝策略
+        executor.setRejectedExecutionHandler(new RejectedExecutionHandler() {
+            @Override
+            public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
+                // todo:1\ 保存拒绝任务
 
-        return null;
+
+                // todo:2\ 通知相关负责人进行手动处理
+
+            }
+        });
+
+        executor.initialize();
+
+        return executor;
     }
 }
