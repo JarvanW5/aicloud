@@ -59,8 +59,8 @@ public class SecurityConfig {
                                         "/user/login",
                                         "/user/register",
                                         "/captcha/create",
-                                        "/tongyi/chat",
-                                        "/tongyi/draw"
+                                        "/qianfan/chat",
+                                        "/qianfan/draw"
                                 ).permitAll()
                                 .anyRequest().authenticated()         // 其他请求都需要认证拦截
                 )

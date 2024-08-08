@@ -7,6 +7,8 @@ import com.alibaba.cloud.ai.tongyi.image.TongYiImagesOptions;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import jakarta.annotation.Resource;
 import org.spring.aicloud.entity.Answer;
+import org.spring.aicloud.entity.enums.AiModelEnum;
+import org.spring.aicloud.entity.enums.AiTypeEnum;
 import org.spring.aicloud.service.IAnswerService;
 import org.spring.aicloud.util.ResponseEntity;
 import org.spring.aicloud.util.SecurityUtil;
@@ -58,9 +60,9 @@ public class TongyiController {
         Answer answer = new Answer();
         answer.setTitle(question);
         answer.setContent(result);
-        answer.setModel(2);    // todo:后面优化成枚举
+        answer.setModel(AiModelEnum.TONGYI.getValue());
         answer.setUid(SecurityUtil.getCurrentUser().getUid());
-        answer.setType(1);     // todo:后面优化成枚举
+        answer.setType(AiTypeEnum.CHAT.getValue());
 
         boolean saveResult = answerService.save(answer);
         if (saveResult) {
@@ -86,9 +88,9 @@ public class TongyiController {
         Answer answer = new Answer();
         answer.setTitle(question);
         answer.setContent(result);
-        answer.setModel(2);          // todo:后面优化成枚举
+        answer.setModel(AiModelEnum.TONGYI.getValue());
         answer.setUid(SecurityUtil.getCurrentUser().getUid());
-        answer.setType(2);           // todo:后面优化成枚举
+        answer.setType(AiTypeEnum.DRAW.getValue());
         boolean saveResult = answerService.save(answer);
         if (saveResult) {
             return ResponseEntity.success(result);
@@ -104,8 +106,8 @@ public class TongyiController {
     public ResponseEntity getChatList() {
 
         QueryWrapper<Answer> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("model", 2);
-        queryWrapper.eq("type", 1);
+        queryWrapper.eq("model", AiModelEnum.TONGYI.getValue());
+        queryWrapper.eq("type", AiTypeEnum.CHAT.getValue());
         queryWrapper.eq("uid", SecurityUtil.getCurrentUser().getUid());
         queryWrapper.orderByDesc("aid");
         List<Answer> list = answerService.list(queryWrapper);
@@ -120,8 +122,8 @@ public class TongyiController {
     public ResponseEntity getDrawList() {
 
         QueryWrapper<Answer> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("model", 2);         // todo:后面优化成枚举
-        queryWrapper.eq("type", 2);          // todo:后面优化成枚举
+        queryWrapper.eq("model", AiModelEnum.TONGYI.getValue());
+        queryWrapper.eq("type", AiTypeEnum.DRAW.getValue());
         queryWrapper.eq("uid", SecurityUtil.getCurrentUser().getUid());
         queryWrapper.orderByDesc("aid");
         List<Answer> list = answerService.list(queryWrapper);
