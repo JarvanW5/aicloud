@@ -13,9 +13,13 @@ import org.spring.aicloud.entity.Discuss;
 import org.spring.aicloud.service.IDiscussService;
 import org.spring.aicloud.util.ResponseEntity;
 import org.spring.aicloud.util.SecurityUtil;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 /**
  * 讨论表控制器
@@ -26,6 +30,47 @@ public class DiscussController {
 
     @Resource
     private IDiscussService discussService;
+
+    @Resource
+    private ThreadPoolTaskExecutor threadPool;
+
+    @RequestMapping("/test")
+    public ResponseEntity test() throws ExecutionException, InterruptedException {
+        CompletableFuture<Integer> task1 = CompletableFuture.supplyAsync(() -> {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            return 1;
+        }, threadPool);
+
+        CompletableFuture<Integer> task2 = CompletableFuture.supplyAsync(() -> {
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            return 2;
+        }, threadPool);
+
+        CompletableFuture<Integer> task3 = CompletableFuture.allOf(task1, task2)
+                .handle((res, e) -> {
+                    try {
+                        return task1.get() + task2.get();
+                    } catch (InterruptedException ex) {
+                        throw new RuntimeException(ex);
+                    } catch (ExecutionException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                });
+
+        Integer result = task3.get();
+        System.out.println(result);
+
+        return ResponseEntity.success("Result:" + result);
+    }
+
 
     /**
      * 添加话题讨论
