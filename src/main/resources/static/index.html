@@ -775,6 +775,35 @@
                 authAjax(jQuery, "/discuss/detail", {
                     did: did
                 }, callback);
+            },
+            "add-comment": function (obj) {
+                var did = jQuery(obj).attr("lay-data");
+                var content = jQuery("#comment-content");
+                if (content.val() == null || content.val().trim() == "") {
+                    layer.msg("评论内容不能为空！");
+                    content.focus();
+                    return;
+                }
+                authAjax(jQuery, "/comment/add", {
+                    did: did,
+                    content: content.val()
+                }, function (res) {
+                    if (res.code == 200) {
+                        layer.msg("添加评论成功！");
+                        var createHtml = "<div style=\"margin-bottom: 30px;\">\n" +
+                            "<b>" + layui.data(login_user_info_key).username +
+                            "</b>：" + content.val() +
+                            "</div>";
+                        if (jQuery("#comment-list").find("div").length == 0) {
+                            jQuery("#comment-list").html(createHtml);
+                        } else {
+                            jQuery("#comment-list").prepend(createHtml);
+                        }
+                        content.val("");
+                    } else {
+                        layer.msg("添加评论失败：" + res.msg);
+                    }
+                });
             }
         });
 

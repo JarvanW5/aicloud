@@ -5,6 +5,9 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import java.time.LocalDateTime;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.io.Serializable;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -34,6 +37,7 @@ public class Comment implements Serializable {
     /**
      * 评论内容
      */
+    @NotBlank(message = "评论内容不能为空")
     private String content;
 
     /**
@@ -44,6 +48,7 @@ public class Comment implements Serializable {
     /**
      * 讨论id
      */
+    @NotNull(message = "讨论id不能为空")
     private Long did;
 
     /**
