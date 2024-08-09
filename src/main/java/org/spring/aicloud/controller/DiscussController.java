@@ -8,6 +8,7 @@ package org.spring.aicloud.controller;
  */
 
 import cn.hutool.core.bean.BeanUtil;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import jakarta.annotation.Resource;
 import org.spring.aicloud.entity.Discuss;
@@ -93,6 +94,15 @@ public class DiscussController {
         if (did == null || did <= 0) return ResponseEntity.error("参数错误！");
         Discuss discuss = discussService.getById(did);
         if (discuss != null && discuss.getDid() > 0) {
+            // 添加阅读量
+            threadPool.submit(() -> {
+                // 1、更新数据
+                discussService.updateReadcount(did);
+
+                // 2、返回对象阅读数+1
+                discuss.setReadcount(discuss.getReadcount() + 1);
+            });
+
             // 任务1：查询 discuss 中的 username
             CompletableFuture<DiscussVO> task1 = CompletableFuture.supplyAsync(() -> {
                 // 对象转换

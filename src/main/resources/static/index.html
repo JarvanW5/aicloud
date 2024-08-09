@@ -170,54 +170,8 @@
                         最新话题讨论详情
                     </div>
                 </div>
-                <div id="discuss-detail-div" style="padding-bottom: 40px;padding-left: 40px;display: none;">
-                    <h2>标题</h2>
-                    <div style="padding-top: 10px;">
-                        作者：<span>王一</span>&nbsp;&nbsp;&nbsp;
-                        发表于：<span>2024-01-01</span>&nbsp;&nbsp;&nbsp;
-                        阅读量：<span>100</span>&nbsp;&nbsp;&nbsp;
-                        点赞数：<span>100</span>&nbsp;&nbsp;&nbsp;
-                    </div>
-                    <div style="padding-top: 30px;">
-                        正文：
-                        <br>
-                        正文内容.....................
-                        <br>
-                        正文内容.....................
-                        <br>
-                        正文内容.....................
-                    </div>
-                    <div style="margin: 16px;">
-                        <i class="layui-icon layui-icon-praise" style="font-size: 30px; color: #f39b12;">点赞</i>
-                    </div>
-                    <hr>
-                    <div>
-                        <h3>发布评论</h3>
-                        <div style="margin-top: 20px;">
+                <div id="discuss-detail-div" style="padding-bottom: 100px;padding-left: 40px;display: none;">
 
-                            <div class="layui-input-group">
-                                <div class="layui-input-prefix">王一：</div>
-                                <textarea style="width: 800px;" name="" placeholder="输入评论内容~"
-                                          class="layui-textarea"></textarea>
-                            </div>
-                            <div style="margin-top: 10px;margin-left: 60px;">
-                                <button type="button" class="layui-btn layui-bg-blue"> 发送</button>
-                            </div>
-                        </div>
-                    </div>
-                    <hr>
-                    <div>
-                        <h3 style="margin-bottom: 30px;">评论列表</h3>
-                        <div style="margin-bottom: 30px;">
-                            <b>张三</b>：xxxxx
-                        </div>
-                        <div style="margin-bottom: 30px;">
-                            <b>李四</b>：xxxxx
-                        </div>
-                        <div style="margin-bottom: 30px;">
-                            <b>陈五</b>：xxxxx
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -746,19 +700,81 @@
                 }, function () {
                 });
             },
-            'doShowDiscuss': function (obj) {   // 点击查看话题详情
+            "doShowDiscuss": function (obj) { // 点击查看话题详情
                 jQuery("#add-discuss-nav").hide();
+                jQuery("#discuss-nav").hide();
                 jQuery("#chat-nav").hide();
                 jQuery("#draw-nav").hide();
-                jQuery("#discuss-nav").hide();
                 // 标签页重置显示第一个
                 var showDivId = "discuss-detail-div";
-                jQuery("#" + showDivId).show();    // 显示自己的内容
-                jQuery("#" + showDivId).siblings().hide();    // 隐藏所有同级 div 的内容
+                jQuery("#" + showDivId).show();
+                jQuery("#" + showDivId).siblings().hide();
                 jQuery("#discuss-nav").find("li").removeClass("layui-this");
                 jQuery("#discuss-nav").find("li").eq(1).addClass("layui-this");
                 // 隐藏聊天文本框
                 jQuery("#footer-chat").hide();
+                // 获取话题详情
+                var did = jQuery(obj).attr("lay-data");
+
+                // 获取话题详情回调事件
+                function callback(res) {
+                    if (res.code == 200) {
+                        var discuss = res.data.discuss;
+                        var commentList = res.data.commentlist;
+                        var html = '<h2>' + discuss.title + '</h2>\n' +
+                            '                    <div style="padding-top: 10px;">\n' +
+                            '                        作者：<span>' + discuss.username + '</span>&nbsp;&nbsp;&nbsp;\n' +
+                            '                        发表于：<span>' + discuss.createtime + '</span>&nbsp;&nbsp;&nbsp;\n' +
+                            '                        阅读量：<span>' + discuss.readcount + '</span>&nbsp;&nbsp;&nbsp;\n' +
+                            '                        点赞数：<span id="discuss-support-count">' + discuss.supportcount + '</span>&nbsp;&nbsp;&nbsp;\n' +
+                            '                    </div>\n' +
+                            '                    <div style="padding-top: 30px;">\n'
+                            + discuss.content + '                        \n' +
+                            '                    </div>\n' +
+                            '                    <div style="margin: 16px;">\n' +
+                            '                        <i lay-on="doSupport" lay-data="' + discuss.did
+                            + '" class="layui-icon layui-icon-praise" style="font-size: 20px; color: #f39b12;">点赞</i>\n' +
+                            '                    </div>\n' +
+                            '                    <hr>\n' +
+                            '                    <div>\n' +
+                            '                        <h3>发布评论</h3>\n' +
+                            '                        <div style="margin-top: 20px;">\n' +
+                            '\n' +
+                            '                            <div class="layui-input-group">\n' +
+                            '                                <div style="width: 110px;" class="layui-input-prefix">' + layui.data(login_user_info_key).username +
+                            '：</div>\n' +
+                            '                                <textarea style="width: 800px;" id="comment-content" placeholder="输入评论内容~"\n' +
+                            '                                          class="layui-textarea"></textarea>\n' +
+                            '                            </div>\n' +
+                            '                            <div style="margin-top: 10px;margin-left: 110px;">\n' +
+                            '                                <button type="button" lay-on="add-comment" lay-data="' + discuss.did +
+                            '" class="layui-btn layui-bg-blue"> 发 送 </button>\n' +
+                            '                            </div>\n' +
+                            '                        </div>\n' +
+                            '                    </div>\n' +
+                            '                    <hr>\n' +
+                            '                    <div>\n' +
+                            '                        <h3 style="margin-bottom: 30px;">评论列表</h3>\n<div id="comment-list">';
+                        if (commentList != null && commentList.length > 0) {
+                            for (let i = 0; i < commentList.length; i++) {
+                                let comment = commentList[i];
+                                html += '<div style="margin-bottom: 30px;">\n' +
+                                    '<b>' + comment.username + '</b>：' +
+                                    comment.content + '\n' +
+                                    '</div>\n';
+                            }
+                        } else {
+                            html += "<h4>暂无评论！</h4>";
+                        }
+                        jQuery("#" + showDivId).html(html + "</div></div>");
+                    } else {
+                        layer.msg("获取话题详情失败：" + res.msg);
+                    }
+                }
+
+                authAjax(jQuery, "/discuss/detail", {
+                    did: did
+                }, callback);
             }
         });
 
