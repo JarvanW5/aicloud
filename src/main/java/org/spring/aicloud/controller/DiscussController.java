@@ -7,10 +7,16 @@ package org.spring.aicloud.controller;
  * @Requirements:
  */
 
+import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import jakarta.annotation.Resource;
 import org.spring.aicloud.entity.Discuss;
+import org.spring.aicloud.entity.User;
+import org.spring.aicloud.entity.vo.CommentVO;
+import org.spring.aicloud.entity.vo.DiscussVO;
+import org.spring.aicloud.service.ICommentService;
 import org.spring.aicloud.service.IDiscussService;
+import org.spring.aicloud.service.IUserService;
 import org.spring.aicloud.util.ResponseEntity;
 import org.spring.aicloud.util.SecurityUtil;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -18,6 +24,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
@@ -33,6 +41,12 @@ public class DiscussController {
 
     @Resource
     private ThreadPoolTaskExecutor threadPool;
+
+    @Resource
+    private IUserService userService;
+
+    @Resource
+    private ICommentService commentService;
 
     @RequestMapping("/test")
     public ResponseEntity test() throws ExecutionException, InterruptedException {
@@ -69,6 +83,38 @@ public class DiscussController {
         System.out.println(result);
 
         return ResponseEntity.success("Result:" + result);
+    }
+
+    /**
+     * 查询讨论详情
+     */
+    @RequestMapping("/detail")
+    public ResponseEntity detail(Long did) throws ExecutionException, InterruptedException {
+        if (did == null || did <= 0) return ResponseEntity.error("参数错误！");
+        Discuss discuss = discussService.getById(did);
+        if (discuss != null && discuss.getDid() > 0) {
+            // 任务1：查询 discuss 中的 username
+            CompletableFuture<DiscussVO> task1 = CompletableFuture.supplyAsync(() -> {
+                // 对象转换
+                DiscussVO discussVO = BeanUtil.toBean(discuss, DiscussVO.class);
+                User user = userService.getById(discuss.getUid());
+                if (user != null && user.getUid() > 0) {
+                    discussVO.setUsername(user.getUsername());
+                }
+                return discussVO;
+            }, threadPool);
+
+            // 任务2：查询 discuss 所对应的 comment 列表
+            CompletableFuture<List<CommentVO>> task2 = CompletableFuture.supplyAsync(() -> {
+                return commentService.getCommentList(did);
+            }, threadPool);
+            CompletableFuture.allOf(task1, task2);
+            HashMap<String, Object> result = new HashMap<>();
+            result.put("discuss", task1.get());
+            result.put("commentList", task2.get());
+            return ResponseEntity.success(result);
+        }
+        return ResponseEntity.error("该讨论不存在，请重试！");
     }
 
 
