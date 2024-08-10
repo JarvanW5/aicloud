@@ -59,7 +59,8 @@ public class SecurityConfig {
                                         "/user/login",
                                         "/user/register",
                                         "/captcha/create",
-                                        "/discuss/detail"
+                                        "/discuss/detail",
+                                        "kafka/**"
                                 ).permitAll()
                                 .anyRequest().authenticated()         // 其他请求都需要认证拦截
                 )
