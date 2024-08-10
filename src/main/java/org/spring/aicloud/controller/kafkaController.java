@@ -3,6 +3,7 @@ package org.spring.aicloud.controller;
 import jakarta.annotation.Resource;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,7 +34,10 @@ public class kafkaController {
     }
 
     @KafkaListener(topics = TOPIC)
-    public void listen(String date) {
+    public void listen(String date, Acknowledgment acknowledgment) {
         System.out.println("收到消息：" + date);
+
+        // 手动确认应答
+        acknowledgment.acknowledge();
     }
 }
