@@ -564,7 +564,7 @@
                     area: ['560px', '400px'],
                     content: '/login.html',
                     fixed: true, // 不固定
-                    title: '登录',
+                    title: "登录",
                     maxmin: false,
                     shadeClose: false,
                     btnAlign: 'c',
@@ -621,7 +621,7 @@
                         jQuery("#discuss-title-input").val("");
                         jQuery("#discuss-content-input").val("");
                     } else {
-                        layer.msg("" + res.msg);
+                        layer.msg("添加失败：" + res.msg);
                     }
                 }
 
@@ -686,7 +686,7 @@
                         if (res.code == 200) {
                             layer.msg("删除成功！");
                             // 删除成功，刷新列表
-                            jQuery("#my-discuss-list").find("[lay-data='" + did + "']").parent().parent().remove();
+                            jQuery("#my-discuss-list").find("[lay-data='" + did + "']").parent().parent().parent().remove();
                         } else {
                             layer.msg("删除失败：" + res.msg);
                         }
@@ -700,7 +700,7 @@
                 }, function () {
                 });
             },
-            "doShowDiscuss": function (obj) { // 点击查看话题详情
+            'doShowDiscuss': function (obj) { // 点击查看话题详情
                 jQuery("#add-discuss-nav").hide();
                 jQuery("#discuss-nav").hide();
                 jQuery("#chat-nav").hide();
@@ -802,6 +802,17 @@
                         content.val("");
                     } else {
                         layer.msg("添加评论失败：" + res.msg);
+                    }
+                });
+            },
+            "doSupport": function (obj) {    // 点赞事件
+                var did = jQuery(obj).attr("lay-data");
+                authAjax(jQuery, "/discuss/support", {
+                    did: did
+                }, function (res) {
+                    if (res.code == 200) {
+                        layer.msg("点赞成功！");
+                        jQuery("#discuss-support-count").html(parseInt(jQuery("#discuss-support-count").html()) + 1);
                     }
                 });
             }

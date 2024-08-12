@@ -13,5 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
  * @since 2024-08-08
  */
 public interface IDiscussService extends IService<Discuss> {
-    int updateReadcount(Long did);
+    int updateReadCount(Long did);
+
+    int updateSupportCount(Long did);
 }

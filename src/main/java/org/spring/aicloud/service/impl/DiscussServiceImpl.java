@@ -22,7 +22,12 @@ public class DiscussServiceImpl extends ServiceImpl<DiscussMapper, Discuss> impl
     private DiscussMapper discussMapper;
 
     @Override
-    public int updateReadcount(Long did) {
-        return discussMapper.updateReadcount(did);
+    public int updateReadCount(Long did) {
+        return discussMapper.updateReadCount(did);
+    }
+
+    @Override
+    public int updateSupportCount(Long did) {
+        return discussMapper.updateSupportCount(did);
     }
 }

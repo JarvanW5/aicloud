@@ -11,15 +11,22 @@ import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import jakarta.annotation.Resource;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.spring.aicloud.entity.Discuss;
+import org.spring.aicloud.entity.DiscussSupport;
 import org.spring.aicloud.entity.User;
 import org.spring.aicloud.entity.vo.CommentVO;
 import org.spring.aicloud.entity.vo.DiscussVO;
 import org.spring.aicloud.service.ICommentService;
 import org.spring.aicloud.service.IDiscussService;
+import org.spring.aicloud.service.IDiscussSupportService;
 import org.spring.aicloud.service.IUserService;
+import org.spring.aicloud.util.AppVariable;
 import org.spring.aicloud.util.ResponseEntity;
 import org.spring.aicloud.util.SecurityUtil;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -48,6 +55,12 @@ public class DiscussController {
 
     @Resource
     private ICommentService commentService;
+
+    @Resource
+    private KafkaTemplate kafkaTemplate;
+
+    @Resource
+    private IDiscussSupportService discussSupportService;
 
     @RequestMapping("/test")
     public ResponseEntity test() throws ExecutionException, InterruptedException {
@@ -97,7 +110,7 @@ public class DiscussController {
             // 添加阅读量
             threadPool.submit(() -> {
                 // 1、更新数据
-                discussService.updateReadcount(did);
+                discussService.updateReadCount(did);
 
                 // 2、返回对象阅读数+1
                 discuss.setReadcount(discuss.getReadcount() + 1);
@@ -172,5 +185,46 @@ public class DiscussController {
             return ResponseEntity.success(result);
         }
         return ResponseEntity.error("删除失败，请重试！");
+    }
+
+
+    /**
+     * 讨论表点赞事件
+     */
+    @RequestMapping("/support")
+    public ResponseEntity support(Long did) {
+        if (did == null || did <= 0) return ResponseEntity.error("参数错误！");
+
+        kafkaTemplate.send(AppVariable.DISCUSS_SUPPORT_TOPIC, did + "_" +
+                SecurityUtil.getCurrentUser().getUid());
+
+        return ResponseEntity.success(true);
+    }
+
+    /**
+     * 监听 Kafka 中的点赞事件
+     */
+    @KafkaListener(topics = {AppVariable.DISCUSS_SUPPORT_TOPIC})
+    public void listen(String data, Acknowledgment acknowledgment) {
+        // 0\ 判断当前登录用户未给当前讨论表点赞过
+        Long did = Long.parseLong(data.split("_")[0]);
+        Long uid = Long.parseLong(data.split("_")[1]);
+        List<DiscussSupport> list = discussSupportService.list(Wrappers.lambdaQuery(DiscussSupport.class)
+                .eq(DiscussSupport::getDid, did)
+                .eq(DiscussSupport::getUid, uid)
+        );
+        if (list == null || list.size() == 0) {
+            // 1\ 修改讨论表中的点赞数
+            int result = discussService.updateSupportCount(did);
+            if (result > 0) {
+                // 2\ 在点赞详情表中添加点赞消息
+                DiscussSupport discussSupport = new DiscussSupport();
+                discussSupport.setDid(did);
+                discussSupport.setUid(uid);
+                discussSupportService.save(discussSupport);
+            }
+        }
+        // 手动确认 kafka 消息
+        acknowledgment.acknowledge();
     }
 }

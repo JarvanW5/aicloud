@@ -1,6 +1,7 @@
 package org.spring.aicloud.mapper;
 
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 import org.spring.aicloud.entity.Discuss;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -15,7 +16,10 @@ import org.springframework.web.bind.annotation.RequestParam;
  */
 public interface DiscussMapper extends BaseMapper<Discuss> {
 
-    @Select("UPDATE discuss SET readcount=readcount+1 WHERE did=#{did}")
-    int updateReadcount(@RequestParam("did") Long did);
+    @Update("UPDATE discuss SET readcount=readcount+1 WHERE did=#{did}")
+    int updateReadCount(@RequestParam("did") Long did);
 
+
+    @Update("UPDATE discuss SET supportcount=supportcount+1 WHERE did=#{did}")
+    int updateSupportCount(@RequestParam("did") Long did);
 }
