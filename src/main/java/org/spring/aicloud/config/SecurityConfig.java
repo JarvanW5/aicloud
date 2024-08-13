@@ -60,7 +60,11 @@ public class SecurityConfig {
                                         "/user/register",
                                         "/captcha/create",
                                         "/discuss/list",
-                                        "kafka/**"
+                                        "kafka/**",
+                                        "/swagger-ui/**",
+                                        "v3/**",
+                                        "/doc.html",
+                                        "/webjars/**"
                                 ).permitAll()
                                 .anyRequest().authenticated()         // 其他请求都需要认证拦截
                 )

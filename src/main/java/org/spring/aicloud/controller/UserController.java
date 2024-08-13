@@ -3,6 +3,10 @@ package org.spring.aicloud.controller;
 import cn.hutool.crypto.SecureUtil;
 import cn.hutool.jwt.JWTUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import org.spring.aicloud.entity.User;
@@ -15,6 +19,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -28,7 +33,8 @@ import java.util.HashMap;
  */
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping ("/user")
+@Tag(name = "用户控制器")
 public class UserController {
 
     @Resource
@@ -50,7 +56,7 @@ public class UserController {
      * @param request
      * @return
      */
-    @RequestMapping("/login")
+    @PostMapping("/login")
     public ResponseEntity login(@Validated UserDTO userDTO, HttpServletRequest request) {
         // 1. 验证图片验证码
         String redisCaptchaKey = NameUtil.getCaptchaName(request);
@@ -82,7 +88,7 @@ public class UserController {
      * 注册功能
      */
 
-    @RequestMapping("/register")
+    @PostMapping("/register")
     public ResponseEntity rsgister(@Validated User user) {
         // 将密码进行加盐处理
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -95,10 +101,14 @@ public class UserController {
         return ResponseEntity.error("注册失败");
     }
 
-    @RequestMapping("/test")
-    public String test() {
+    @Operation(summary = "测试接口")
+    @PostMapping("/test")
+    @Parameters({
+            @Parameter(name = "msg", description = "信息")
+    })
+    public String test(String msg) {
 
-        return "OK";
+        return "OK -> " + msg;
     }
 
 }
