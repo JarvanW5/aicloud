@@ -64,7 +64,8 @@ public class SecurityConfig {
                                         "/swagger-ui/**",
                                         "v3/**",
                                         "/doc.html",
-                                        "/webjars/**"
+                                        "/webjars/**",
+                                        "doubao/**"
                                 ).permitAll()
                                 .anyRequest().authenticated()         // 其他请求都需要认证拦截
                 )

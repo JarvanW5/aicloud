@@ -94,6 +94,12 @@
             <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
             <version>4.5.0</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/com.volcengine/volcengine-java-sdk-ark-runtime -->
+        <dependency>
+            <groupId>com.volcengine</groupId>
+            <artifactId>volcengine-java-sdk-ark-runtime</artifactId>
+            <version>0.1.123</version>
+        </dependency>
 
         <dependency>
             <groupId>org.projectlombok</groupId>
