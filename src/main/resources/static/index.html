@@ -306,6 +306,16 @@
             authAjax(jQuery, "/qianfan/getchatlist", {}, doShowList);
         }
 
+        // 显示qianfan历史对话列表
+        function showDoubaoChatHistory() {
+            // 回调显示方法
+            function doShowList(res) {
+                baseChatShowList("chat-doubao-content", res);
+            }
+
+            authAjax(jQuery, "/doubao/getchatlist", {}, doShowList);
+        }
+
         // 绘图功能历史信息基础方法封装
         function baseDrawShowList(divId, res) {
             if (res.code === 200) {
@@ -542,6 +552,8 @@
             showXunfeiChatHistory();
             // 显示千帆大模型历史对话信息
             showQianfanChatHistory();
+            // 显示豆包大模型历史对话信息
+            showDoubaoChatHistory();
 
         });
 

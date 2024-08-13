@@ -7,6 +7,7 @@ package org.spring.aicloud.controller;
  * @Requirements:
  */
 
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.volcengine.ark.runtime.model.completion.chat.ChatCompletionRequest;
 import com.volcengine.ark.runtime.model.completion.chat.ChatMessage;
 import com.volcengine.ark.runtime.model.completion.chat.ChatMessageRole;
@@ -21,6 +22,7 @@ import org.spring.aicloud.util.ResponseEntity;
 import org.spring.aicloud.util.SecurityUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -86,5 +88,20 @@ public class DoubaoController {
         }
 
         return ResponseEntity.error("请求操作失败，请重试！");
+    }
+
+
+    /**
+     * 查询历史对话信息
+     */
+    @PostMapping("/getchatlist")
+    public ResponseEntity chatList() {
+        List<Answer> list = answerService.list(Wrappers.lambdaQuery(Answer.class)
+                .eq(Answer::getUid, SecurityUtil.getCurrentUser().getUid())
+                .eq(Answer::getModel, AiModelEnum.DOUBAO.getValue())
+                .eq(Answer::getType, AiTypeEnum.CHAT.getValue())
+                .orderByDesc(Answer::getAid)
+        );
+        return ResponseEntity.success(list);
     }
 }
