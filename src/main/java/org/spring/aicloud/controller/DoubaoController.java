@@ -11,8 +11,14 @@ import com.volcengine.ark.runtime.model.completion.chat.ChatCompletionRequest;
 import com.volcengine.ark.runtime.model.completion.chat.ChatMessage;
 import com.volcengine.ark.runtime.model.completion.chat.ChatMessageRole;
 import com.volcengine.ark.runtime.service.ArkService;
+import jakarta.annotation.Resource;
+import org.spring.aicloud.entity.Answer;
+import org.spring.aicloud.entity.enums.AiModelEnum;
+import org.spring.aicloud.entity.enums.AiTypeEnum;
+import org.spring.aicloud.service.IAnswerService;
 import org.spring.aicloud.util.ResponseEntity;
 
+import org.spring.aicloud.util.SecurityUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,6 +40,9 @@ public class DoubaoController {
     private String url;
     @Value("${doubao.model-id}")
     private String modelId;
+
+    @Resource
+    private IAnswerService answerService;
 
 
     /**
@@ -65,6 +74,17 @@ public class DoubaoController {
                 .getMessage()
                 .getContent().toString();
         System.out.println("豆包大模型结果" + result);
-        return ResponseEntity.success(result);
+        // 将对话信息存储到数据库
+        Answer answer = new Answer();
+        answer.setTitle(question);
+        answer.setContent(result);
+        answer.setModel(AiModelEnum.DOUBAO.getValue());
+        answer.setUid(SecurityUtil.getCurrentUser().getUid());
+        answer.setType(AiTypeEnum.CHAT.getValue());
+        if (answerService.save(answer)) {
+            return ResponseEntity.success(result);
+        }
+
+        return ResponseEntity.error("请求操作失败，请重试！");
     }
 }

@@ -26,6 +26,8 @@
                 lay-data="chat-xunfei-content"><a href="javascript:;">讯飞星火</a></li>
             <li class="layui-nav-item layui-hide-xs" lay-on="nav-change-content"
                 lay-data="chat-wenxin-content"><a href="javascript:;">文心一言</a></li>
+            <li class="layui-nav-item layui-hide-xs" lay-on="nav-change-content"
+                lay-data="chat-doubao-content"><a href="javascript:;">豆包</a></li>
         </ul>
         <ul id="draw-nav" class="layui-nav layui-layout-left" style="display: none;">
             <!-- 移动端显示 -->
@@ -117,6 +119,9 @@
 
                 </div>
                 <div id="chat-wenxin-content" class="layui-card layui-panel" style="display: none;">
+
+                </div>
+                <div id="chat-doubao-content" class="layui-card layui-panel" style="display: none;">
 
                 </div>
                 <div id="draw-chatgpt-content" class="layui-card layui-panel" style="display: none;">
@@ -415,6 +420,14 @@
 
             authAjax(jQuery, '/qianfan/chat', {question: question}, callback);
         }
+        // 调用豆包大模型聊天功能
+        function doDoubaoChat(question) {
+            function callback(res) {
+                baseCallback("chat-doubao-content", question, res);
+            }
+
+            authAjax(jQuery, '/doubao/chat', {question: question}, callback);
+        }
 
         // 封装绘图公共回调方法
         function baseDrawCallback(divId, question, res) {
@@ -603,7 +616,8 @@
                     // doOpenAIChat(question);   // 调用 OpenAI 聊天功能
                     // doTongyiChat(question);      // 调用通义大模型的聊天功能
                     // doXunfeiChat(question);        // 调用讯飞大模型聊天功能
-                    doQianfanChat(question);         // 调用千帆大模型聊天功能
+                    // doQianfanChat(question);         // 调用千帆大模型聊天功能
+                    doDoubaoChat(question);         // 调用豆包大模型聊天功能
                 } else if (question_type == "draw") {   // 绘图功能
                     // doOpenAIDraw(question);      // 调用 OpenAI 绘图功能
                     // doTongyiDraw(question);         // 调用通义大模型的绘图功能
