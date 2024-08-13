@@ -12,6 +12,7 @@ import org.spring.aicloud.entity.Comment;
 import org.spring.aicloud.service.ICommentService;
 import org.spring.aicloud.util.ResponseEntity;
 import org.spring.aicloud.util.SecurityUtil;
+import org.spring.aicloud.util.idempotent.Idempotent;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,6 +33,7 @@ public class CommentController {
      */
 
     @RequestMapping("/add")
+    @Idempotent
     public ResponseEntity add(@Validated Comment comment) {
         comment.setUid(SecurityUtil.getCurrentUser().getUid());
 

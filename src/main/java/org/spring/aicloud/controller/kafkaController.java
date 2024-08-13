@@ -1,6 +1,7 @@
 package org.spring.aicloud.controller;
 
 import jakarta.annotation.Resource;
+import org.spring.aicloud.util.idempotent.Idempotent;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.Acknowledgment;
@@ -22,6 +23,13 @@ public class kafkaController {
 
     @Resource
     private KafkaTemplate kafkaTemplate;
+
+
+    @RequestMapping("/idtest")
+    @Idempotent
+    public String idtest(String data) {
+        return "data:" + data;
+    }
 
     @RequestMapping("/send")
     public String send(String msg) {

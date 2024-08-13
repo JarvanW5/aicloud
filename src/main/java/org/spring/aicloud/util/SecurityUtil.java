@@ -16,9 +16,13 @@ public class SecurityUtil {
      *
      * @return
      */
-
     public static SecurityUserDetails getCurrentUser() {
-        return (SecurityUserDetails)SecurityContextHolder.getContext()
-                .getAuthentication().getPrincipal();
+        SecurityUserDetails userDetails = null;
+        try {
+            userDetails = (SecurityUserDetails) SecurityContextHolder.getContext()
+                    .getAuthentication().getPrincipal();
+        } catch (Exception e) {
+        }
+        return userDetails;
     }
 }
