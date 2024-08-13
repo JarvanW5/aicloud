@@ -8,8 +8,10 @@ package org.spring.aicloud.controller;
  */
 
 import cn.hutool.core.bean.BeanUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.annotation.Resource;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.spring.aicloud.entity.Discuss;
@@ -167,6 +169,29 @@ public class DiscussController {
                         .eq(Discuss::getUid, SecurityUtil.getCurrentUser().getUid())
                         .orderByDesc(Discuss::getDid)
         ));
+    }
+
+    /**
+     * 获取讨论列表（带分页的）
+     *
+     * @param page 当前第几页
+     * @param type 1: 热门推荐（根据点赞数进行排序），2： 最新（根据最新的时间进行排序）
+     */
+    @RequestMapping("/list")
+    public ResponseEntity list(Integer page, Integer type) {
+        // 参数预处理
+        if (page == null || page <= 0) page = 1;
+        if (type == null || type <= 0) type = 1;
+
+        QueryWrapper<Discuss> queryWrapper = new QueryWrapper<>();
+        if (type == 1) {    // 根据点赞数
+            queryWrapper.orderByDesc("supportcount");
+        } else {    // 根据创建时间排序 ---> 直接使用did来排序，效率更高
+            queryWrapper.orderByDesc("did");
+        }
+        Page<Discuss> result = discussService.page(new Page<>(page, AppVariable.PAGE_SIZE),
+                queryWrapper);
+        return ResponseEntity.success(result);
     }
 
 

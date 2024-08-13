@@ -15,4 +15,5 @@ public class AppVariable {
     // 讨论表点赞 Topic 名称
     public static final String DISCUSS_SUPPORT_TOPIC = "DISCUSS_SUPPORT_TOPIC";
 
+    public static final int PAGE_SIZE = 3;            // todo: 后期上线，改成 15
 }
