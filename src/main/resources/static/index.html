@@ -131,13 +131,17 @@
                 <div id="draw-wenxin-content" class="layui-card layui-panel" style="display: none;">
 
                 </div>
-                <div id="discuss-content" class="layui-card layui-panel" style="display: none;">
-                    <div class="layui-card-header layui-font-16">
-                        推荐话题讨论
+                <div id="discuss-content" style="display: none;">
+                    <div id="discuss-list-support">
+
                     </div>
-                    <div class="layui-card-body">
-                        推荐话题讨论详情
+                    <div id="discuss-laypage-normal"></div>
+                </div>
+                <div id="discuss-content-new" style="display: none;">
+                    <div id="discuss-list-did">
+
                     </div>
+                    <div id="discuss-laypage2-normal"></div>
                 </div>
                 <div id="add-discuss-content" style="display: none;">
                     <div class="layui-input-group" style="width: 80%; margin-top: 25px;">
@@ -160,14 +164,6 @@
                         <div id="my-discuss-list" class="layui-row layui-col-space15">
 
                         </div>
-                    </div>
-                </div>
-                <div id="discuss-content-new" class="layui-card layui-panel" style="display: none;">
-                    <div class="layui-card-header layui-font-16">
-                        最新话题讨论
-                    </div>
-                    <div class="layui-card-body">
-                        最新话题讨论详情
                     </div>
                 </div>
                 <div id="discuss-detail-div" style="padding-bottom: 100px;padding-left: 40px;display: none;">
@@ -204,6 +200,7 @@
         var layer = layui.layer;
         var util = layui.util;
         var jQuery = layui.$;
+        var laypage = layui.laypage;
         var question_type = "chat";       // 默认当前在使用聊天
         var is_first_load_draw_openai = true;    // 是否首次加载绘图历史列表
         var is_first_load_draw_tongyi = true;    // 是否首次加载绘图历史列表
@@ -469,6 +466,56 @@
             authAjax(jQuery, '/qianfan/draw', {question: question}, callback);
         }
 
+        // 话题列表展示查询
+        function doDiscussList(type, showDiv, pageDiv) {
+            // 查询推荐列表
+            function callback(res) {
+                if (res.code == 200) {
+                    // 正常返回响应信息，显示回答
+                    var createHtml = "";
+                    if (res.data.records.length > 0) {
+                        for (let i = 0; i < res.data.records.length; i++) {
+                            let discuss = res.data.records[i];
+                            createHtml += '<div class="layui-card layui-panel">\n' +
+                                '                            <div lay-on="doShowDiscuss" lay-data="' +
+                                discuss.did + '" class="layui-card-header layui-font-16">\n' +
+                                discuss.title + '                                \n' +
+                                '                            </div>\n' +
+                                '                            <div class="layui-card-body">\n' +
+                                discuss.content + '                                ' +
+                                '                            </div>\n' +
+                                '                        </div>';
+                        }
+                    } else {
+                        createHtml += '<h3>暂无数据！</h3>';
+                    }
+                    jQuery("#" + showDiv).html(createHtml);
+                    // 绘制分页列表
+                    laypage.render({
+                        elem: pageDiv,
+                        count: res.data.total, // 数据总数
+                        limit: 3, // 每页显示的条数
+                        curr: res.data.current, // 当前页
+                        jump: function (obj, first) {
+                            // 首次不执行
+                            if (!first) {
+                                let page = obj.curr; // 得到当前页
+                                authAjax(jQuery, "/discuss/list", {
+                                    page: page,
+                                    type: type
+                                }, callback);
+                            }
+                        }
+                    });
+                }
+            }
+
+            authAjax(jQuery, "/discuss/list", {
+                page: 1,
+                type: type
+            }, callback);
+        }
+
 
         // 页面加载完成之后执行的初始化事件
         layer.ready(function () {
@@ -498,6 +545,8 @@
                 jQuery("#discuss-nav").find("li").eq(1).addClass("layui-this");
                 // 隐藏聊天文本框
                 jQuery("#footer-chat").hide();
+                // 展示话题列表
+                doDiscussList(1, "discuss-list-support", "discuss-laypage-normal");
             },
             'chat-nav-show': function () {        // 显示对话标签页
                 jQuery("#chat-nav").show();
@@ -539,6 +588,10 @@
                 var showDivId = jQuery(e).attr("lay-data");
                 jQuery("#" + showDivId).show();    // 显示自己的内容
                 jQuery("#" + showDivId).siblings().hide();    // 隐藏所有同级 div 的内容
+                if (showDivId == "discuss-content-new") {
+                    // 请求最新的话题列表进行展示
+                    doDiscussList(2, "discuss-list-did", "discuss-laypage2-normal");
+                }
             },
             'question-send': function () {       // 发送问题
                 var question = jQuery("#question-input").val();
