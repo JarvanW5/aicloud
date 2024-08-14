@@ -26,6 +26,8 @@ public class MinIoUtil {
     private MinioClient minioClient;
     @Value("${minio.bucket}")
     private String bucketName;
+    @Value("${minio.endpoint}")
+    private String minIOUrl;
 
     public String upload(String fileName, InputStream inputStream, String contentType) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
 
@@ -34,15 +36,18 @@ public class MinIoUtil {
             minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
         }
         minioClient.putObject(PutObjectArgs.builder()
-                        .bucket(bucketName)
-                        .object(fileName)
-                        .stream(inputStream, -1, 10485760)
-                        .contentType(contentType)
+                .bucket(bucketName)
+                .object(fileName)
+                .stream(inputStream, -1, 10485760)
+                .contentType(contentType)
                 .build());
-        return minioClient.getPresignedObjectUrl(GetPresignedObjectUrlArgs.builder()
-                        .bucket(bucketName)
-                        .object(fileName)
-                        .method(Method.GET)
-                .build());
+//        return minioClient.getPresignedObjectUrl(GetPresignedObjectUrlArgs.builder()
+//                        .bucket(bucketName)
+//                        .object(fileName)
+//                        .method(Method.GET)
+//                .build());
+
+        return minIOUrl + "/" + bucketName + "/" + fileName;
+
     }
 }

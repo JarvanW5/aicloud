@@ -28,7 +28,6 @@ import java.util.concurrent.TimeUnit;
  * @Description:
  * @Requirements:
  */
-
 @RestController
 @RequestMapping("/captcha")
 public class CaptchaController {
