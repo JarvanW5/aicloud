@@ -10,16 +10,23 @@ import org.spring.aicloud.entity.Answer;
 import org.spring.aicloud.entity.enums.AiModelEnum;
 import org.spring.aicloud.entity.enums.AiTypeEnum;
 import org.spring.aicloud.service.IAnswerService;
+import org.spring.aicloud.util.MinIoUtil;
 import org.spring.aicloud.util.ResponseEntity;
 import org.spring.aicloud.util.SecurityUtil;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.image.Image;
 import org.springframework.ai.image.ImagePrompt;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.awt.*;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Base64;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @Author: JarvanW
@@ -40,6 +47,9 @@ public class TongyiController {
 
     @Resource
     private IAnswerService answerService;
+
+    @Resource
+    private MinIoUtil minIoUtil;
 
     /**
      * 聊天
@@ -82,18 +92,29 @@ public class TongyiController {
         if (!StringUtils.hasLength(question)) {
             return ResponseEntity.error("问题不能为空");
         }
-        String result = imageClient.call(new ImagePrompt(question))
-                .getResult().getOutput().getUrl();
+
+        Image image = imageClient.call(new ImagePrompt(question))
+                .getResult().getOutput();
+        String base64 = image.getB64Json();
+
+        String url = "";
+        try (InputStream inputStream = new ByteArrayInputStream(
+                Base64.getDecoder().decode(base64))) {
+            String fileName = "ty_" + UUID.randomUUID().toString().replace("-", "");
+            url = minIoUtil.upload(fileName, inputStream, "image/png");
+        } catch (Exception e) {
+            return ResponseEntity.error("图片转换失败,请重试！");
+        }
 
         Answer answer = new Answer();
         answer.setTitle(question);
-        answer.setContent(result);
+        answer.setContent(url);
         answer.setModel(AiModelEnum.TONGYI.getValue());
         answer.setUid(SecurityUtil.getCurrentUser().getUid());
         answer.setType(AiTypeEnum.DRAW.getValue());
         boolean saveResult = answerService.save(answer);
         if (saveResult) {
-            return ResponseEntity.success(result);
+            return ResponseEntity.success(url);
         }
         return ResponseEntity.error("保存失败,请重试！");
     }
