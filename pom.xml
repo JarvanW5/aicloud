@@ -100,7 +100,12 @@
             <artifactId>volcengine-java-sdk-ark-runtime</artifactId>
             <version>0.1.123</version>
         </dependency>
-
+        <!--        分布式定时任务执行依赖-->
+        <dependency>
+            <groupId>com.xuxueli</groupId>
+            <artifactId>xxl-job-core</artifactId>
+            <version>2.4.1</version>
+        </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>

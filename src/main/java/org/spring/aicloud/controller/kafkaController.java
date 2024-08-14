@@ -1,5 +1,6 @@
 package org.spring.aicloud.controller;
 
+import com.xxl.job.core.handler.annotation.XxlJob;
 import jakarta.annotation.Resource;
 import org.spring.aicloud.util.idempotent.Idempotent;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -29,6 +30,11 @@ public class kafkaController {
     @Idempotent
     public String idtest(String data) {
         return "data:" + data;
+    }
+
+    @XxlJob("testjob")
+    public void testjob() {
+        System.out.println("执行了定时任务");
     }
 
     @RequestMapping("/send")
