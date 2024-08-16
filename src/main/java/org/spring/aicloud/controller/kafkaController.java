@@ -2,6 +2,8 @@ package org.spring.aicloud.controller;
 
 import com.xxl.job.core.handler.annotation.XxlJob;
 import jakarta.annotation.Resource;
+import org.redisson.api.RedissonClient;
+import org.spring.aicloud.util.AppVariable;
 import org.spring.aicloud.util.idempotent.Idempotent;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -9,6 +11,8 @@ import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * @Author: JarvanW
@@ -26,8 +30,34 @@ public class kafkaController {
     private KafkaTemplate kafkaTemplate;
 
 
+    @Resource
+    private RedissonClient redissonClient;
+
+    @RequestMapping("/testlock")
+    public String testlock() {
+        String msg = "";
+        String lockKey = AppVariable.getModelLockKey(1L, 1, 1);
+        boolean isLock = false;
+        try {
+            isLock = redissonClient.getLock(lockKey).tryLock(30, TimeUnit.SECONDS);
+            msg = "获得分布式加锁：" + isLock;
+            System.out.println(msg);
+        } catch (Exception e) {
+
+        } finally {
+            redissonClient.getLock(lockKey).unlock();
+        }
+
+        if (!isLock) {
+            msg = "获得分布式加锁失败~";
+            System.out.println(msg);
+        }
+        return msg;
+    }
+
+
     @RequestMapping("/idtest")
-    @Idempotent
+//    @Idempotent
     public String idtest(String data) {
         return "data:" + data;
     }
