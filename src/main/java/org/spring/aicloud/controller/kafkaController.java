@@ -38,6 +38,11 @@ public class kafkaController {
     @Value("${mytest:javacn.set}")
     private String mytest;
 
+    @RequestMapping("/test")
+    public String test() {
+        return "hello world";
+    }
+
     @RequestMapping("/getconfig")
     public String getConfig() {
         return mytest;
