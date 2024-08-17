@@ -5,6 +5,8 @@ import jakarta.annotation.Resource;
 import org.redisson.api.RedissonClient;
 import org.spring.aicloud.util.AppVariable;
 import org.spring.aicloud.util.idempotent.Idempotent;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.Acknowledgment;
@@ -20,7 +22,7 @@ import java.util.concurrent.TimeUnit;
  * @Description:
  * @Requirements:
  */
-
+@RefreshScope
 @RestController
 @RequestMapping("/kafka")
 public class kafkaController {
@@ -32,6 +34,14 @@ public class kafkaController {
 
     @Resource
     private RedissonClient redissonClient;
+
+    @Value("${mytest:javacn.set}")
+    private String mytest;
+
+    @RequestMapping("/getconfig")
+    public String getConfig() {
+        return mytest;
+    }
 
     @RequestMapping("/testlock")
     public String testlock() {
