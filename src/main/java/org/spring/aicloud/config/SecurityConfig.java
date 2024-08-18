@@ -65,7 +65,8 @@ public class SecurityConfig {
                                         "v3/**",
                                         "/doc.html",
                                         "/webjars/**",
-                                        "doubao/**"
+                                        "doubao/**",
+                                        "/"
                                 ).permitAll()
                                 .anyRequest().authenticated()         // 其他请求都需要认证拦截
                 )

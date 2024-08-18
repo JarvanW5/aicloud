@@ -21,4 +21,10 @@ public class AppVariable {
     public static String getModelLockKey(Long uid, int model, int type) {
         return "MODEL_LOCK_KEY_" + uid + "_" + model + "_" + type;
     }
+
+
+    // 列表缓存 key
+    public static String getListCacheKey(Long uid, int model, int type) {
+        return "LIST_CACHE_KEY_" + uid + "_" + model + "_" + type;
+    }
 }
