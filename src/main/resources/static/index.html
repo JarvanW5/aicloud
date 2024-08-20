@@ -401,7 +401,8 @@
                 baseCallback("chat-chatgpt-content", question, res);
             }
 
-            authAjax(jQuery, '/openai/chat', {question: question}, callback);
+            // authAjax(jQuery, '/openai/chat', {question: question}, callback);
+            authAjax(jQuery, '/chatgpt/chat', {question: question}, callback);
         }
 
         // 调用通义大模型聊天功能
@@ -625,16 +626,16 @@
                     return;
                 }
                 if (question_type == "chat") {     // 对话功能
-                    // doOpenAIChat(question);   // 调用 OpenAI 聊天功能
+                    doOpenAIChat(question);   // 调用 OpenAI 聊天功能
                     // doTongyiChat(question);      // 调用通义大模型的聊天功能
                     // doXunfeiChat(question);        // 调用讯飞大模型聊天功能
                     // doQianfanChat(question);         // 调用千帆大模型聊天功能
-                    doDoubaoChat(question);         // 调用豆包大模型聊天功能
+                    // doDoubaoChat(question);         // 调用豆包大模型聊天功能
                 } else if (question_type == "draw") {   // 绘图功能
                     // doOpenAIDraw(question);      // 调用 OpenAI 绘图功能
                     doTongyiDraw(question);         // 调用通义大模型的绘图功能
-                    // doXunfeiDraw(question);             // 调用讯飞大模型的绘图功能
-                    // doQianfanDraw(question);          // 调用千帆大模型的绘图功能
+                    doXunfeiDraw(question);             // 调用讯飞大模型的绘图功能
+                    doQianfanDraw(question);          // 调用千帆大模型的绘图功能
                 }
             },
             'doLogin': function () {

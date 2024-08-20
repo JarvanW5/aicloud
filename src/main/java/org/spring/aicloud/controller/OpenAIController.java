@@ -31,7 +31,9 @@ import java.util.concurrent.TimeUnit;
  * @Requirements:
  */
 
-
+/**
+ * 调用云端大模型
+ */
 @RestController
 @RequestMapping("/openai")
 public class OpenAIController {
