@@ -35,13 +35,13 @@
                 <i class="layui-icon layui-icon-spread-left"></i>
             </li>
             <li class="layui-nav-item layui-hide-xs" lay-on="nav-change-content"
-                lay-data="draw-chatgpt-content"><a href="javascript:;">ChatGPT</a></li>
-            <li class="layui-nav-item layui-hide-xs" lay-on="nav-change-content"
                 lay-data="draw-tongyi-content"><a href="javascript:;">通义千问</a></li>
             <li class="layui-nav-item layui-hide-xs" lay-on="nav-change-content"
                 lay-data="draw-xunfei-content"><a href="javascript:;">讯飞星火</a></li>
             <li class="layui-nav-item layui-hide-xs" lay-on="nav-change-content"
                 lay-data="draw-wenxin-content"><a href="javascript:;">文心一言</a></li>
+            <li style="display: none;" class="layui-nav-item layui-hide-xs" lay-on="nav-change-content"
+                lay-data="draw-chatgpt-content"><a href="javascript:;">ChatGPT</a></li>
         </ul>
         <ul id="discuss-nav" class="layui-nav layui-layout-left" style="display: none;">
             <!-- 移动端显示 -->
@@ -468,7 +468,26 @@
                 // 正常返回响应信息，显示回答
                 jQuery("#" + divId).prepend(
                     createDrawHtml(question, res.data));
-                jQuery("#question-input").val("");
+                var model = "";
+                if (divId == "draw-chatgpt-content") {
+                    model = "ChatGPT";
+                } else if (divId == "draw-tongyi-content") {
+                    model = "通义千问";
+                } else if (divId == "draw-xunfei-content") {
+                    model = "讯飞星火";
+                } else if (divId == "draw-wenxin-content") {
+                    model = "文心一言";
+                } else if (divId == "draw-doubao-content") {
+                    model = "豆包";
+                }
+                layer.msg(model + "：生成成功！");
+                draw_succ_maxcount--;
+                if (draw_succ_maxcount == 0) { // 所有大模型生成完成
+                    jQuery("#question-input").val("");
+                    jQuery("#question-send").html("发送");
+                    jQuery("#question-send").removeAttr("disabled");
+                    draw_succ_maxcount = 3;
+                }
             } else {
                 layer.msg("出错了：" + res.msg);
             }
@@ -614,7 +633,7 @@
                 jQuery("#chat-nav").hide();
                 jQuery("#discuss-nav").hide();
                 // 标签页重置显示第一个
-                var showDivId = "draw-chatgpt-content";
+                var showDivId = "draw-tongyi-content";
                 jQuery("#" + showDivId).show();    // 显示自己的内容
                 jQuery("#" + showDivId).siblings().hide();    // 隐藏所有同级 div 的内容
                 jQuery("#draw-nav").find("li").removeClass("layui-this");
@@ -622,8 +641,8 @@
                 // 显示聊天文本框
                 jQuery("#footer-chat").show();
                 question_type = "draw";
-                // 显示 openai 历史绘图信息
-                showOpenAIDrawHistory();
+                // // 显示 openai 历史绘图信息
+                // showOpenAIDrawHistory();
                 // 通义大模型历史绘图信息
                 showTongyiDrawHistory();
                 // 显示讯飞大模型历史绘图信息
