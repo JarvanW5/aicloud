@@ -211,6 +211,8 @@
         var is_first_load_draw_tongyi = true;    // 是否首次加载绘图历史列表
         var is_first_load_draw_xunfei = true;    // 是否首次加载绘图历史列表
         var is_first_load_draw_qianfan = true;    // 是否首次加载绘图历史列表
+        var chat_succ_maxcount = 5;
+        var draw_succ_maxcount = 3;
 
 
         // 登录状态的判断
@@ -388,7 +390,26 @@
                 // 正常返回响应信息，显示回答
                 jQuery("#" + showDiv).prepend(
                     createChatHtml(question, res.data));
-                jQuery("#question-input").val("");
+                var model = "";
+                if (showDiv == "chat-chatgpt-content") {
+                    model = "ChatGPT";
+                } else if (showDiv == "chat-tongyi-content") {
+                    model = "通义千问";
+                } else if (showDiv == "chat-xunfei-content") {
+                    model = "讯飞星火";
+                } else if (showDiv == "chat-wenxin-content") {
+                    model = "文心一言";
+                } else if (showDiv == "chat-doubao-content") {
+                    model = "豆包";
+                }
+                layer.msg(model + "：生成成功！");
+                chat_succ_maxcount--;
+                if (chat_succ_maxcount == 0) { // 所有大模型生成完成
+                    jQuery("#question-input").val("");
+                    jQuery("#question-send").html("发送");
+                    jQuery("#question-send").removeAttr("disabled");
+                    chat_succ_maxcount = 5;
+                }
             } else {
                 layer.msg("出错了：" + res.msg);
             }
@@ -625,12 +646,15 @@
                     layer.msg("请先输入问题！");
                     return;
                 }
+                // 发送按钮不可用
+                jQuery("#question-send").attr("disabled", "disabled");
+                jQuery("#question-send").html("生成中...");
                 if (question_type == "chat") {     // 对话功能
                     doOpenAIChat(question);   // 调用 OpenAI 聊天功能
-                    // doTongyiChat(question);      // 调用通义大模型的聊天功能
-                    // doXunfeiChat(question);        // 调用讯飞大模型聊天功能
-                    // doQianfanChat(question);         // 调用千帆大模型聊天功能
-                    // doDoubaoChat(question);         // 调用豆包大模型聊天功能
+                    doTongyiChat(question);      // 调用通义大模型的聊天功能
+                    doXunfeiChat(question);        // 调用讯飞大模型聊天功能
+                    doQianfanChat(question);         // 调用千帆大模型聊天功能
+                    doDoubaoChat(question);         // 调用豆包大模型聊天功能
                 } else if (question_type == "draw") {   // 绘图功能
                     // doOpenAIDraw(question);      // 调用 OpenAI 绘图功能
                     doTongyiDraw(question);         // 调用通义大模型的绘图功能
