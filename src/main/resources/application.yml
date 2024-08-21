@@ -1,51 +1,26 @@
 spring:
   application:
     name: aicloud
-  ai:
-    openai:
-      base-url: https://api.xiaoai.plus
-      api-key: sk-RmUvdTbuxullxBHE835904763d114d3187D1693052A0BaCb
-    retry:
-      max-attempts: 3
-      backoff:
-        multiplier: 2
-  cloud:
-    ai:
-      tongyi:
-        api-key: sk-903fa0ce317643fc850708a23d4530b2
-  data:
-    redis:
-      host: 127.0.0.1
-      port: 6379
+  config:
+    import: nacos:aicloud-config
   datasource:
-    url: jdbc:mysql://127.0.0.1:3306/aicloud?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
-    username: root
-    password: 133411
-    driver-class-name: com.mysql.cj.jdbc.Driver
-minio:
-  endpoint: http://127.0.0.1:9000
-  access-key: 5l0FCQu8GH85djr3t8Q7
-  secret-key: AKL3Mz3uVXPuzcUWlaEnOz5owTjfBfBqIfY29IL5
-  bucket: aicloud
-mybatis-plus:
-  mapper-locations: classpath*:mapper/*.xml
-  configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-logging:
-  level:
-    org:
-      spring:
-        aicloud: debug
-jwt:
-  secret: aicloud_springcloud_secret
-
-xunfei:
-  chat:
-    url: https://spark-api-open.xf-yun.com/v1/chat/completions
-    api-key: 3e6840fd030bc6f1dc5abaa6c2ee491e
-    api-secret: MzkyMDI5YmE5ODVlOGZhMWJiZjkzOGEw
-  draw:
-    host-url: https://spark-api.cn-huabei-1.xf-yun.com/v2.1/tti
-    app-id: a8d2e790
-    api-key: 3e6840fd030bc6f1dc5abaa6c2ee491e
-    api-secret: MzkyMDI5YmE5ODVlOGZhMWJiZjkzOGEw
+    driver-class-name: org.apache.shardingsphere.driver.ShardingSphereDriver
+    url: jdbc:shardingsphere:classpath:sharding.yml
+  ai:
+    ollama:
+      base-url: http://localhost:11434
+      chat:
+        options:
+          model: openchat:7b
+  cloud:
+    nacos:
+      config:
+        username: nacos
+        password: nacos
+        context-path: /nacos
+        namespace: public
+        server-addr: localhost:8848
+        group: DEFAULT_GROUP
+        file-extension: yaml
+server:
+  port: 8080
